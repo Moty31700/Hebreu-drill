@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ivrit-Drill · גן נעול — ביאליק</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Hebrew:wght@400;700;900&family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0d0b;--bg2:#1a1710;--bg3:#252219;--panel:#1e1b14;--panel2:#2a2620;--border:#3d3828;--gold:#d4a84b;--gold2:#f0c96a;--gold3:#8a6a20;--cream:#f5e9c8;--cream2:#e8d5a0;--ink:#f0e8d0;--ink2:#b8a880;--ink3:#7a6a50;--blue:#4a90d9;--blue2:#2d5f9a;--green:#5aab6a;--green2:#2e7040;--red:#d45a4a;--purple:#9a6adb;--orange:#e8834a;--teal:#4aaba0}
+*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%;overflow:hidden}
+body{font-family:'Source Serif 4',Georgia,serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
+#app-header{background:linear-gradient(135deg,#1a1508,#0f0d0b 60%,#1a1205);border-bottom:2px solid var(--gold3);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:relative}
+#app-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.header-heb{font-family:'Noto Serif Hebrew',serif;font-size:26px;font-weight:900;color:var(--gold);direction:rtl;text-shadow:0 0 20px rgba(212,168,75,.4)}
+.header-fr{font-size:11px;color:var(--ink3);letter-spacing:.15em;text-transform:uppercase}
+#status-text{color:var(--gold2);font-size:13px}#doc-name{font-size:11px;color:var(--ink3);margin-top:2px}
+#app-body{display:flex;flex:1;overflow:hidden}
+#sidebar{width:200px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.nav-section-title{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink3);padding:12px 16px 5px;border-top:1px solid var(--border)}
+.nav-section-title:first-child{border-top:none;padding-top:14px}
+.nav-btn{display:flex;align-items:center;gap:9px;padding:10px 16px;border:none;background:transparent;color:var(--ink2);cursor:pointer;font-family:'Source Serif 4',serif;font-size:13px;text-align:left;width:100%;transition:all .18s;border-left:3px solid transparent}
+.nav-btn:hover{background:var(--panel2);color:var(--cream)}.nav-btn.active{background:var(--panel2);color:var(--gold);border-left-color:var(--gold)}
+.nav-icon{font-size:15px;width:20px;text-align:center}
+#main{flex:1;overflow-y:auto;background:var(--bg)}
+.panel{display:none;padding:26px 30px;max-width:920px;margin:0 auto;animation:fadeSlide .3s ease}.panel.active{display:block}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.panel-title{font-family:'Playfair Display',serif;font-size:23px;color:var(--gold);margin-bottom:5px;display:flex;align-items:center;gap:10px}
+.panel-sub{font-size:13px;color:var(--ink3);margin-bottom:20px;font-style:italic}
+.divider{height:1px;background:linear-gradient(90deg,var(--gold3),transparent);margin:16px 0}
+.btn{padding:8px 18px;border-radius:6px;border:none;cursor:pointer;font-family:'Source Serif 4',serif;font-size:13px;font-weight:600;transition:all .18s}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold3));color:#0f0d0b}.btn-gold:hover{filter:brightness(1.15);transform:translateY(-1px)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--ink2)}.btn-ghost:hover{border-color:var(--gold3);color:var(--cream)}
+.btn-blue{background:var(--blue2);border:1px solid var(--blue);color:var(--cream)}.btn-blue:hover{filter:brightness(1.2)}
+.btn-green{background:var(--green2);border:1px solid var(--green);color:var(--cream)}
+.btn-audio{background:var(--panel2);border:1px solid var(--blue2);color:var(--blue);padding:5px 11px;border-radius:4px;font-size:12px;cursor:pointer;font-family:'Source Serif 4',serif;font-weight:600;transition:all .18s}.btn-audio:hover{background:var(--blue2);color:var(--cream)}
+.btn-erase{background:var(--panel2);border:1px solid var(--red);color:var(--red);padding:5px 11px;border-radius:4px;font-size:12px;cursor:pointer;font-family:'Source Serif 4',serif;font-weight:600;transition:all .18s}.btn-erase:hover{background:rgba(212,90,74,.2)}
+.btn-sm{padding:5px 12px;font-size:12px}.btn-xs{padding:3px 8px;font-size:11px}
+.btn-copy{background:var(--panel2);border:1px solid var(--gold3);color:var(--gold);padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer;font-family:'Source Serif 4',serif;font-weight:600;transition:all .18s}.btn-copy:hover{background:var(--gold3);color:var(--bg)}
+.input-group{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.input-group label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3)}
+.input-group input,.input-group textarea{background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--cream);font-family:'Source Serif 4',serif;font-size:14px;padding:9px 13px;transition:border .15s}
+.input-group input:focus,.input-group textarea:focus{outline:none;border-color:var(--gold3)}
+.input-heb{direction:rtl;font-family:'Noto Serif Hebrew',serif !important;font-size:21px !important}
+textarea{min-height:80px;resize:vertical}
+#notif{position:fixed;bottom:20px;right:20px;background:var(--panel2);border:1px solid var(--gold3);border-radius:8px;padding:9px 16px;font-size:13px;color:var(--gold2);display:none;z-index:999;animation:slideIn .25s ease}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0}}
+#drop-zone{border:2px dashed var(--border);border-radius:12px;padding:30px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--panel);margin-bottom:14px}
+#drop-zone:hover,#drop-zone.drag-over{border-color:var(--gold);background:var(--panel2)}
+#drop-zone .drop-icon{font-size:32px;margin-bottom:8px}#drop-zone p{color:var(--ink2);font-size:14px}#drop-zone strong{color:var(--gold)}
+#file-input,#json-input{display:none}
+/* LOADING OVERLAY */
+.loading-overlay{position:fixed;inset:0;background:rgba(15,13,11,.85);z-index:900;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.loading-overlay.active{display:flex}
+.loading-spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{color:var(--gold2);font-size:15px;font-style:italic}
+/* READER */
+.reader-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.reader-col{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;min-height:200px;max-height:320px;overflow-y:auto}
+.reader-col-label{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink3);margin-bottom:7px;display:flex;align-items:center;justify-content:space-between}
+#text-heb-box{font-family:'Noto Serif Hebrew',serif;font-size:19px;line-height:2;direction:rtl;color:var(--ink);white-space:pre-wrap}
+#text-fr-box{font-size:14px;line-height:1.8;color:var(--cream2);white-space:pre-wrap}
+.audio-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.audio-badge{display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--border);border-radius:20px;padding:4px 11px;font-size:12px;color:var(--ink2)}
+.playing-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.ai-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(74,144,217,.1);border:1px solid var(--blue2);border-radius:20px;padding:4px 11px;font-size:12px;color:var(--blue)}
+.ai-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);animation:pulse 1.2s infinite;flex-shrink:0}
+/* GRAMMAR */
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:9px;margin-bottom:18px}
+.cat-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:pointer;transition:all .2s}
+.cat-card:hover{border-color:var(--gold3);transform:translateY(-2px)}.cat-card.selected{border-color:var(--gold);box-shadow:0 0 12px rgba(212,168,75,.2)}
+.cat-header{padding:9px 13px;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
+.cat-count{font-size:11px;background:rgba(255,255,255,.1);border-radius:10px;padding:1px 7px}
+.cat-preview{padding:4px 13px 9px;font-size:12px;color:var(--ink3);font-style:italic}
+.word-list{display:none;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:10px}.word-list.open{display:block}
+.word-row{display:grid;grid-template-columns:auto 120px 1fr 1fr auto;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--bg3)}.word-row:last-child{border-bottom:none}
+.word-heb{font-family:'Noto Serif Hebrew',serif;font-size:20px;font-weight:700;color:var(--cream);direction:rtl;text-align:right}
+.word-fr{font-size:13px;color:var(--ink2)}.word-morph{font-size:10px;color:var(--teal);font-style:italic;line-height:1.3}
+.word-type{font-size:10px;color:var(--ink3);background:var(--bg3);padding:2px 6px;border-radius:10px;text-transform:uppercase;white-space:nowrap;text-align:center}
+/* LEXIQUE */
+.lex-filter-bar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.lex-filter-btn{padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:var(--panel);color:var(--ink2);cursor:pointer;font-size:12px;transition:all .15s;font-family:'Source Serif 4',serif}
+.lex-filter-btn.active,.lex-filter-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(212,168,75,.1)}
+.lex-search{background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--cream);font-family:'Source Serif 4',serif;font-size:13px;padding:6px 11px;width:180px;outline:none}
+.lex-search:focus{border-color:var(--gold3)}
+.lex-table{width:100%;border-collapse:collapse;font-size:13px}
+.lex-table th{background:var(--panel2);color:var(--gold);padding:8px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border)}
+.lex-table td{padding:8px 10px;border-bottom:1px solid var(--bg3);color:var(--ink2);vertical-align:middle}
+.lex-table tr:hover td{background:var(--panel2)}
+.lex-heb{font-family:'Noto Serif Hebrew',serif;font-size:18px;color:var(--cream);direction:rtl}
+.lex-root{font-family:'Noto Serif Hebrew',serif;font-size:13px;color:var(--teal);direction:rtl}
+.lex-badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;white-space:nowrap}
+/* RECONSTRUCTION */
+.phrase-sentence{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px}
+.phrase-fr-hint{font-size:13px;color:var(--cream2);font-style:italic;margin-bottom:10px;padding:7px 12px;background:rgba(212,168,75,.07);border-left:3px solid var(--gold3);border-radius:4px}
+.drop-target{min-height:48px;border:2px dashed var(--border);border-radius:6px;padding:7px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px;direction:rtl;transition:background .15s}
+.drop-target.drag-over{background:rgba(212,168,75,.05);border-color:var(--gold3)}
+.labels-pool{display:flex;flex-wrap:wrap;gap:6px;direction:rtl;padding:6px 0 8px;border-top:1px dashed var(--border);margin-top:4px}
+.label-tag{font-family:'Noto Serif Hebrew',serif;font-size:16px;padding:4px 11px;background:var(--panel2);border:1px solid var(--border);border-radius:4px;cursor:grab;user-select:none;transition:all .15s;color:var(--cream)}
+.label-tag:hover{border-color:var(--gold3)}.label-tag.dragging{opacity:.35}.label-tag.placed{background:var(--blue2);border-color:var(--blue)}
+.phrase-check{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:7px}
+.phrase-feedback{font-size:13px;padding:4px 10px;border-radius:4px;display:none}
+.phrase-feedback.correct{display:block;background:rgba(90,171,106,.15);color:var(--green)}.phrase-feedback.wrong{display:block;background:rgba(212,90,74,.15);color:var(--red)}
+/* PERSONAL */
+.personal-editor{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:17px;margin-bottom:16px}
+.saved-phrase-item{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:11px 13px;display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.saved-phrase-heb{font-family:'Noto Serif Hebrew',serif;font-size:19px;direction:rtl;color:var(--cream);flex:1;text-align:right}
+.saved-phrase-fr{font-size:13px;color:var(--ink3)}.saved-phrase-actions{display:flex;gap:5px;flex-shrink:0}
+/* SAVE */
+.save-section{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:17px;margin-bottom:12px}
+.save-section h3{font-size:14px;color:var(--gold);margin-bottom:10px}
+.code-block-wrap{position:relative;margin:7px 0}
+.code-block{background:#0a0908;border:1px solid var(--border);border-radius:6px;padding:11px 36px 11px 11px;font-family:'Courier New',monospace;font-size:11px;color:#88c090;white-space:pre-wrap;word-break:break-all;max-height:120px;overflow-y:auto;user-select:all}
+.code-copy-btn{position:absolute;top:6px;right:6px}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--gold3)}
+@media(max-width:640px){#sidebar{width:52px}.nav-btn span:not(.nav-icon){display:none}.nav-section-title{display:none}.reader-cols{grid-template-columns:1fr}.panel{padding:12px}.word-row{grid-template-columns:auto 1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text" id="loading-text">Chargement…</div>
+</div>
+
+<div id="app-header">
+  <div><div class="header-heb">אִיבְרִית-דְּרִיל</div><div class="header-fr">Ivrit-Drill · Apprentissage Hébreu</div></div>
+  <div style="text-align:right"><div id="status-text">Prêt</div><div id="doc-name">Aucun document chargé</div></div>
+</div>
+
+<div id="app-body">
+<nav id="sidebar">
+  <div class="nav-section-title">Document</div>
+  <button class="nav-btn active" onclick="showPanel('import')" id="nav-import"><span class="nav-icon">📂</span><span> Charger</span></button>
+  <button class="nav-btn" onclick="showPanel('reader')" id="nav-reader"><span class="nav-icon">📖</span><span> Lire &amp; Audio</span></button>
+  <div class="nav-section-title">Analyse</div>
+  <button class="nav-btn" onclick="showPanel('grammar')" id="nav-grammar"><span class="nav-icon">🔤</span><span> Grammaire</span></button>
+  <button class="nav-btn" onclick="showPanel('lexicon')" id="nav-lexicon"><span class="nav-icon">📚</span><span> Lexique</span></button>
+  <div class="nav-section-title">Exercices</div>
+  <button class="nav-btn" onclick="showPanel('reconstruction')" id="nav-reconstruction"><span class="nav-icon">🧩</span><span> Reconstruction</span></button>
+  <div class="nav-section-title">Personnel</div>
+  <button class="nav-btn" onclick="showPanel('personal')" id="nav-personal"><span class="nav-icon">✍️</span><span> Mes phrases</span></button>
+  <div class="nav-section-title">Fichiers</div>
+  <button class="nav-btn" onclick="showPanel('save')" id="nav-save"><span class="nav-icon">💾</span><span> Sauvegarder</span></button>
+</nav>
+
+<main id="main">
+
+<!-- IMPORT -->
+<div class="panel active" id="panel-import">
+  <div class="panel-title">📂 Charger un document</div>
+  <div class="panel-sub">Glisse un .txt ou .docx, colle du texte hébreu, ou charge le texte démo</div>
+  <div id="drop-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+    <div class="drop-icon">📄</div>
+    <p><strong>Clique ici</strong> ou glisse un fichier .txt ou .docx</p>
+    <p style="margin-top:5px;font-size:12px;color:var(--ink3)">Max <strong style="color:var(--gold)">500 Ko</strong></p>
+  </div>
+  <input type="file" id="file-input" accept=".txt,.md,.docx" onchange="handleFileSelect(event)">
+  <div class="input-group">
+    <label>Ou coller le texte hébreu directement</label>
+    <textarea id="paste-area" placeholder="הַיּוֹם יוֹם שֵׁנִי..." style="min-height:100px;direction:rtl;font-family:'Noto Serif Hebrew',serif;font-size:18px"></textarea>
+  </div>
+  <div style="display:flex;gap:9px;flex-wrap:wrap">
+    <button class="btn btn-gold" onclick="loadPastedText()">✓ Charger ce texte</button>
+    <button class="btn btn-ghost btn-sm" onclick="loadDemo()">📜 Démo : גן נעול — ביאליק</button>
+  </div>
+  <div class="divider"></div>
+  <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px">
+    <div style="font-size:13px;color:var(--gold);font-weight:600;margin-bottom:6px">↩️ Restaurer depuis un JSON</div>
+    <button class="btn btn-blue btn-sm" onclick="document.getElementById('json-input').click()">📂 Importer JSON</button>
+    <input type="file" id="json-input" accept=".json" onchange="importJSON(event)">
+  </div>
+</div>
+
+<!-- READER -->
+<div class="panel" id="panel-reader">
+  <div class="panel-title">📖 Lecteur &amp; Audio</div>
+  <div class="panel-sub">Hébreu et traduction côte à côte — lecture audio des deux langues</div>
+  <div class="reader-cols">
+    <div class="reader-col">
+      <div class="reader-col-label">
+        <span>🇮🇱 Hébreu</span>
+        <div style="display:flex;gap:5px">
+          <button class="btn-copy" onclick="copyText(state.rawText)">📋</button>
+          <button class="btn-audio" onclick="readHeb()">🔊</button>
+          <button class="btn-erase" onclick="clearBox('heb')" title="Effacer">✕</button>
+        </div>
+      </div>
+      <div id="text-heb-box">Aucun texte chargé.</div>
+    </div>
+    <div class="reader-col">
+      <div class="reader-col-label">
+        <span>🇫🇷 Traduction</span>
+        <div style="display:flex;gap:5px">
+          <button class="btn-copy" onclick="copyText(state.translation)">📋</button>
+          <button class="btn-audio" style="border-color:var(--green2);color:var(--green)" onclick="readFr()">🔊</button>
+          <button class="btn-erase" onclick="clearBox('fr')" title="Effacer">✕</button>
+        </div>
+      </div>
+      <div id="text-fr-box" style="color:var(--ink3);font-style:italic;font-size:13px">Traduction automatique après chargement.</div>
+    </div>
+  </div>
+  <div class="audio-controls">
+    <button class="btn btn-gold btn-sm" onclick="readHeb()">🔊 Lire hébreu</button>
+    <button class="btn btn-green btn-sm" onclick="readFr()">🔊 Lire français</button>
+    <button class="btn btn-ghost btn-sm" onclick="stopReading()">⏹ Stop</button>
+    <div class="audio-badge" id="audio-badge" style="display:none"><div class="playing-dot"></div><span id="badge-lang">Lecture…</span></div>
+    <div class="ai-badge" id="trad-badge" style="display:none"><div class="ai-dot"></div><span>Traduction en cours…</span></div>
+  </div>
+  <div style="font-size:12px;color:var(--ink3)">🔊 Voix <strong>he-IL</strong> requise. macOS : Réglages → Accessibilité → Contenu énoncé → Voix → Hébreu</div>
+</div>
+
+<!-- GRAMMAR -->
+<div class="panel" id="panel-grammar">
+  <div class="panel-title">🔤 Analyse morphologique</div>
+  <div class="panel-sub">Analyse automatique par Claude — catégories, racines, formes verbales</div>
+  <div class="ai-badge" id="grammar-badge" style="display:none;margin-bottom:12px"><div class="ai-dot"></div><span>Analyse en cours…</span></div>
+  <div class="cat-grid" id="cat-grid"><div style="color:var(--ink3)">Chargez un texte d'abord.</div></div>
+  <div id="cat-word-list" class="word-list"></div>
+</div>
+
+<!-- LEXIQUE -->
+<div class="panel" id="panel-lexicon">
+  <div class="panel-title">📚 Lexique du texte</div>
+  <div class="panel-sub">Tous les mots — recherche et filtre par catégorie grammaticale</div>
+  <div class="lex-filter-bar">
+    <input type="text" class="lex-search" id="lex-search" placeholder="🔍 Rechercher…" oninput="renderLexicon()">
+    <button class="lex-filter-btn active" onclick="setLexFilter('all',this)">Tous</button>
+    <button class="lex-filter-btn" onclick="setLexFilter('פועל',this)">⚡ Verbes</button>
+    <button class="lex-filter-btn" onclick="setLexFilter('שם עצם',this)">🏛️ Noms</button>
+    <button class="lex-filter-btn" onclick="setLexFilter('שם תואר',this)">🎨 Adjectifs</button>
+    <button class="lex-filter-btn" onclick="setLexFilter('כינוי גוף',this)">👤 Pronoms</button>
+    <button class="lex-filter-btn" onclick="setLexFilter('מילת יחס',this)">🔗 Prép.</button>
+    <button class="lex-filter-btn" onclick="setLexFilter('other',this)">📌 Autres</button>
+  </div>
+  <div id="lex-wrap"><div style="color:var(--ink3)">Chargez un texte d'abord.</div></div>
+</div>
+
+<!-- RECONSTRUCTION -->
+<div class="panel" id="panel-reconstruction">
+  <div class="panel-title">🧩 Reconstruction de phrases</div>
+  <div class="panel-sub">La traduction française est affichée — reconstituez la phrase hébraïque dans le bon ordre</div>
+  <div id="recon-container"><div style="color:var(--ink3)">Chargez un texte d'abord.</div></div>
+</div>
+
+<!-- PERSONNEL -->
+<div class="panel" id="panel-personal">
+  <div class="panel-title">✍️ Mes phrases personnelles</div>
+  <div class="panel-sub">Ajoute, écoute et exporte tes propres phrases</div>
+  <div class="personal-editor">
+    <div class="input-group"><label>Phrase en hébreu</label><input type="text" id="inp-heb" class="input-heb" dir="rtl" placeholder="הַיּוֹם יוֹם טוֹב"></div>
+    <div class="input-group"><label>Traduction française</label><input type="text" id="inp-fr" placeholder="Aujourd'hui c'est une bonne journée"></div>
+    <div class="input-group"><label>Catégorie</label><input type="text" id="inp-cat" placeholder="vocabulaire, grammaire, expression…"></div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <button class="btn btn-gold" onclick="addPhrase()">+ Ajouter</button>
+      <button class="btn-audio" onclick="playPhrase(document.getElementById('inp-heb').value,'he')">🔊 HE</button>
+      <button class="btn-audio" style="border-color:var(--green2);color:var(--green)" onclick="playPhrase(document.getElementById('inp-fr').value,'fr')">🔊 FR</button>
+    </div>
+  </div>
+  <div id="personal-count" style="font-size:13px;color:var(--ink3);margin-bottom:10px">0 phrase(s)</div>
+  <div id="saved-list"></div>
+</div>
+
+<!-- SAVE -->
+<div class="panel" id="panel-save">
+  <div class="panel-title">💾 Sauvegarder &amp; Restaurer</div>
+  <div class="panel-sub">Exporte en HTML ou JSON pour reprendre plus tard</div>
+  <div class="save-section">
+    <h3>📄 Texte hébreu chargé</h3>
+    <div class="code-block-wrap">
+      <div class="code-block" id="save-preview" style="font-family:'Noto Serif Hebrew',serif;font-size:14px;direction:rtl;color:var(--cream2)">—</div>
+      <button class="btn-copy code-copy-btn" onclick="copyText(state.rawText)">📋</button>
+    </div>
+  </div>
+  <div class="save-section">
+    <h3>⬇️ Téléchargement</h3>
+    <div style="display:flex;gap:9px;flex-wrap:wrap">
+      <button class="btn btn-gold" onclick="downloadHTML()">⬇️ HTML complet</button>
+      <button class="btn btn-ghost" onclick="downloadJSON()">⬇️ JSON données</button>
+    </div>
+    <p style="font-size:12px;color:var(--ink3);margin-top:8px">Le JSON peut être rechargé via « ↩️ Importer JSON »</p>
+  </div>
+</div>
+
+</main>
+</div>
+<div id="notif"></div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// DÉMO INTÉGRÉE — גן נעול (ביאליק)
+// ═══════════════════════════════════════════════════
+const DEMO_HEB=`מי אתה? מדוע יד מושטת לא פוגשת יד אחות?
+ועיניים, אך תמתנה רגע והנה שפלו כבר נבוכות
+גן נעול - לא שביל אליו לא דרך
+גן נעול - אדם
+גן נעול האלך לי, או אכה בסלע עד זוב דם
+עד זוב דם`;
+
+const DEMO_TRAD=`Qui es-tu ? Pourquoi une main tendue ne rencontre-t-elle pas une main sœur ?
+Et les yeux — qu'ils attendent un instant — et voilà qu'ils se sont déjà baissés, confus
+Jardin fermé — ni sentier ni route vers lui
+Jardin fermé — l'homme
+Jardin fermé — m'en irai-je, ou frapperai-je le rocher jusqu'au sang
+Jusqu'au sang`;
+
+const DEMO_WORDS=[
+  {heb:'מי',fr:'qui',cat:'מילת שאלה',morph:'מילת שאלה',root:''},
+  {heb:'אתה',fr:'tu / toi',cat:'כינוי גוף',morph:'כינוי גוף, זכר יחיד',root:''},
+  {heb:'מדוע',fr:'pourquoi',cat:'מילת שאלה',morph:'מילת שאלה',root:''},
+  {heb:'יד',fr:'main',cat:'שם עצם',morph:'שם עצם נקבה יחידה',root:'י-ד'},
+  {heb:'מושטת',fr:'tendue / étendue',cat:'שם תואר',morph:'בינוני סביל, פועל, נקבה יחידה',root:'ש-ט-ט'},
+  {heb:'לא',fr:'ne … pas',cat:'מילת שלילה',morph:'מילת שלילה',root:''},
+  {heb:'פוגשת',fr:'rencontre',cat:'פועל',morph:'בניין קל, הווה, נקבה יחידה',root:'פ-ג-ש'},
+  {heb:'אחות',fr:'sœur / fraternelle',cat:'שם עצם',morph:'שם עצם נקבה יחידה · כאן: תואר',root:'א-ח'},
+  {heb:'ועיניים',fr:'et les yeux',cat:'שם עצם',morph:"ו' + שם עצם נקבה זוגי",root:'ע-י-ן'},
+  {heb:'אך',fr:'mais / seulement',cat:'מילת תיאור',morph:'תואר הפועל מגביל',root:''},
+  {heb:'תמתנה',fr:'elles attendent',cat:'פועל',morph:'בניין קל, עתיד, נקבה רבות',root:'מ-ת-נ'},
+  {heb:'רגע',fr:'un instant',cat:'שם עצם',morph:'שם עצם זכר יחיד · מושא זמן',root:'ר-ג-ע'},
+  {heb:'והנה',fr:'et voilà',cat:'מילת תיאור',morph:"ו' + כינוי הצבעה",root:''},
+  {heb:'שפלו',fr:'ils se sont baissés',cat:'פועל',morph:'בניין קל, עבר, זכר רבים',root:'ש-פ-ל'},
+  {heb:'כבר',fr:'déjà',cat:'מילת תיאור',morph:'תואר הפועל — זמן',root:''},
+  {heb:'נבוכות',fr:'confuses / perdues',cat:'שם תואר',morph:'בינוני סביל, נקבה רבות',root:'נ-ב-כ'},
+  {heb:'גן',fr:'jardin',cat:'שם עצם',morph:'שם עצם זכר יחיד',root:'ג-נ-נ'},
+  {heb:'נעול',fr:'fermé / verrouillé',cat:'שם תואר',morph:'בינוני סביל, בניין קל, זכר יחיד',root:'נ-ע-ל'},
+  {heb:'שביל',fr:'sentier / chemin étroit',cat:'שם עצם',morph:'שם עצם זכר יחיד',root:'ש-ב-ל'},
+  {heb:'אליו',fr:'vers lui',cat:'מילת יחס',morph:"מילת יחס אֶל + כינוי, זכר יחיד",root:''},
+  {heb:'דרך',fr:'route / voie',cat:'שם עצם',morph:'שם עצם נקבה יחידה',root:'ד-ר-כ'},
+  {heb:'אדם',fr:'homme / être humain',cat:'שם עצם',morph:'שם עצם זכר יחיד · כינוי כללי',root:'א-ד-מ'},
+  {heb:'האלך',fr:'irai-je ?',cat:'פועל',morph:"ה' השאלה + בניין קל, עתיד, יחיד",root:'ה-ל-כ'},
+  {heb:'לי',fr:"m'en aller / pour moi",cat:'מילת יחס',morph:"לְ + כינוי גוף, יחיד — דאטיב אתי",root:''},
+  {heb:'או',fr:'ou',cat:'מילת תיאור',morph:'מילת חיבור חלופית',root:''},
+  {heb:'אכה',fr:'frapperai-je',cat:'פועל',morph:'בניין קל, עתיד, יחיד · מגזרת נ',root:'נ-כ-ה'},
+  {heb:'בסלע',fr:'contre le rocher',cat:'מילת יחס',morph:"ב' + שם עצם זכר יחיד",root:'ס-ל-ע'},
+  {heb:'עד',fr:"jusqu'à",cat:'מילת יחס',morph:'מילת יחס של גבול',root:''},
+  {heb:'זוב',fr:'couler / saigner',cat:'פועל',morph:'שם פועל, בניין קל · שם עצם: זרימה',root:'ז-ו-ב'},
+  {heb:'דם',fr:'sang',cat:'שם עצם',morph:'שם עצם זכר יחיד',root:'ד-מ'},
+];
+
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+const state={rawText:'',sentences:[],words:[],personalPhrases:[],docName:'',translation:'',lexFilter:'all'};
+
+// ═══════════════════════════════════════════════════
+// LOADING
+// ═══════════════════════════════════════════════════
+function showLoading(msg){document.getElementById('loading-text').textContent=msg||'Chargement…';document.getElementById('loading-overlay').classList.add('active')}
+function hideLoading(){document.getElementById('loading-overlay').classList.remove('active')}
+
+// ═══════════════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════════════
+function showPanel(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  if(name==='grammar')renderGrammar();
+  if(name==='lexicon')renderLexicon();
+  if(name==='reconstruction')renderReconstruction();
+  if(name==='save')document.getElementById('save-preview').textContent=state.rawText||'—';
+}
+
+// ═══════════════════════════════════════════════════
+// IMPORT / DOCX
+// ═══════════════════════════════════════════════════
+function handleDragOver(e){e.preventDefault();document.getElementById('drop-zone').classList.add('drag-over')}
+function handleDragLeave(){document.getElementById('drop-zone').classList.remove('drag-over')}
+function handleDrop(e){e.preventDefault();document.getElementById('drop-zone').classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f)processFile(f)}
+function handleFileSelect(e){const f=e.target.files[0];if(f)processFile(f);e.target.value=''}
+
+async function processFile(file){
+  if(file.size>512000){notify('⚠️ Fichier trop grand (max 500 Ko)');return}
+  if(file.name.toLowerCase().endsWith('.docx')){
+    showLoading('Extraction du .docx…');
+    try{
+      await loadMammoth();
+      const buf=await file.arrayBuffer();
+      const result=await mammoth.extractRawText({arrayBuffer:buf});
+      const lines=result.value.split('\n').filter(l=>/[\u05D0-\u05EA]/.test(l));
+      hideLoading();
+      if(!lines.length){notify('⚠️ Aucun texte hébreu dans ce docx');return}
+      loadText(lines.join('\n'),file.name.replace(/\.docx$/i,''));
+    }catch(err){hideLoading();notify('⚠️ Erreur .docx : '+err.message);console.error(err)}
+    return;
+  }
+  const r=new FileReader();r.onload=ev=>loadText(ev.target.result.trim(),file.name);r.readAsText(file,'UTF-8');
+}
+
+function loadMammoth(){
+  return new Promise((res,rej)=>{
+    if(window.mammoth){res();return}
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
+    s.onload=res;s.onerror=()=>rej(new Error('Impossible de charger mammoth.js'));
+    document.head.appendChild(s);
+  });
+}
+
+function loadPastedText(){const t=document.getElementById('paste-area').value.trim();if(!t){notify('Zone vide');return}loadText(t,'Texte collé')}
+
+function loadDemo(){
+  state.words=DEMO_WORDS;
+  _loadTextCore(DEMO_HEB,'גן נעול — ח.נ. ביאליק');
+  state.translation=DEMO_TRAD;updateFrBox();
+  document.getElementById('status-text').textContent=state.sentences.length+' phrases · '+state.words.length+' mots';
+  notify('✓ Démo chargée');
+  showPanel('reader');
+}
+
+async function loadText(text,name){
+  _loadTextCore(text,name);
+  state.words=[];
+  showPanel('reader');
+  autoTranslate(text);
+  autoAnalyze(text);
+}
+
+function _loadTextCore(text,name){
+  state.rawText=text;state.docName=name;
+  state.sentences=extractSentences(text);
+  document.getElementById('text-heb-box').textContent=text;
+  document.getElementById('doc-name').textContent=name;
+  document.getElementById('status-text').textContent=state.sentences.length+' phrases';
+}
+
+function extractSentences(t){
+  return t.split(/\n+/).map(s=>s.trim()).filter(s=>s.length>3&&/[\u05D0-\u05EA]/.test(s));
+}
+
+// ═══════════════════════════════════════════════════
+// CLAUDE API — TRADUCTION
+// ═══════════════════════════════════════════════════
+async function autoTranslate(text){
+  const badge=document.getElementById('trad-badge');
+  badge.style.display='flex';
+  const box=document.getElementById('text-fr-box');
+  box.textContent='Traduction automatique en cours…';box.style.color='var(--ink3)';box.style.fontStyle='italic';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
+        messages:[{role:'user',content:'Traduis ce texte hébreu en français naturel. Conserve les retours à la ligne. Réponds UNIQUEMENT avec la traduction, sans commentaires.\n\n'+text}]})
+    });
+    const d=await r.json();
+    const trad=d.content?.find(b=>b.type==='text')?.text||'';
+    badge.style.display='none';
+    if(trad){state.translation=trad;updateFrBox();notify('✓ Traduction automatique prête')}
+    else{box.textContent='Traduction non disponible.';notify('⚠️ Traduction échouée')}
+  }catch(e){badge.style.display='none';box.textContent='Erreur API traduction.';box.style.color='var(--red)'}
+}
+
+// ═══════════════════════════════════════════════════
+// CLAUDE API — ANALYSE MORPHOLOGIQUE
+// ═══════════════════════════════════════════════════
+async function autoAnalyze(text){
+  const badge=document.getElementById('grammar-badge');
+  badge.style.display='flex';
+  const prompt=`Analyse morphologique de ce texte hébreu. Extrait chaque mot distinct et fournis un JSON array. Chaque objet doit avoir exactement ces champs :
+- "heb" : le mot hébreu
+- "fr" : traduction française courte
+- "cat" : catégorie EN HÉBREU, parmi exactement : פועל / שם עצם / שם תואר / כינוי גוף / מילת יחס / מילת שלילה / מילת תיאור / מילת שאלה / מילת השוואה / מילת כלל / תואר הפועל / קריאה
+- "morph" : description morphologique courte en hébreu (בניין, זמן, גוף, מין, מספר pour les verbes)
+- "root" : racine au format א-ב-ג (chaîne vide si pas de racine identifiable)
+
+Texte :
+${text}
+
+Réponds UNIQUEMENT avec le JSON array brut, sans backticks, sans commentaires.`;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
+        messages:[{role:'user',content:prompt}]})
+    });
+    const d=await r.json();
+    const raw=d.content?.find(b=>b.type==='text')?.text||'';
+    const clean=raw.replace(/```(?:json)?|```/g,'').trim();
+    const words=JSON.parse(clean);
+    badge.style.display='none';
+    if(Array.isArray(words)&&words.length){
+      state.words=words;
+      document.getElementById('status-text').textContent=state.sentences.length+' phrases · '+words.length+' mots';
+      notify('✓ Analyse morphologique prête ('+words.length+' mots)');
+    }
+  }catch(e){badge.style.display='none';notify('⚠️ Erreur analyse morphologique')}
+}
+
+// ═══════════════════════════════════════════════════
+// AUDIO
+// ═══════════════════════════════════════════════════
+function playPhrase(text,lang){
+  if(!text||!text.trim())return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang=lang==='fr'?'fr-FR':'he-IL';u.rate=lang==='he'?0.82:0.9;
+  window.speechSynthesis.speak(u);return u;
+}
+function readHeb(){
+  if(!state.rawText){notify('Aucun texte');return}
+  const u=playPhrase(state.rawText,'he');
+  const b=showBadge('he');u.onend=u.onerror=()=>b.style.display='none';
+}
+function readFr(){
+  if(!state.translation){notify('Pas de traduction');return}
+  const u=playPhrase(state.translation,'fr');
+  const b=showBadge('fr');u.onend=u.onerror=()=>b.style.display='none';
+}
+function stopReading(){window.speechSynthesis.cancel();document.getElementById('audio-badge').style.display='none'}
+function showBadge(lang){
+  const b=document.getElementById('audio-badge');
+  document.getElementById('badge-lang').textContent=lang==='he'?'🇮🇱 Lecture hébreu…':'🇫🇷 Lecture français…';
+  b.style.display='flex';return b;
+}
+function clearBox(which){
+  if(which==='heb'){document.getElementById('text-heb-box').textContent='Effacé.';state.rawText='';notify('✕ Texte hébreu effacé')}
+  else{const b=document.getElementById('text-fr-box');b.textContent='Effacé.';b.style.color='var(--ink3)';b.style.fontStyle='italic';state.translation='';notify('✕ Traduction effacée')}
+}
+function updateFrBox(){
+  const b=document.getElementById('text-fr-box');
+  b.textContent=state.translation;b.style.color='var(--cream2)';b.style.fontStyle='normal';
+}
+
+// ═══════════════════════════════════════════════════
+// GRAMMAIRE
+// ═══════════════════════════════════════════════════
+const CAT_DEFS=[
+  {key:'פועל',label:'Verbes',color:'var(--blue)',icon:'⚡',fr:'Actions, états, infinitifs'},
+  {key:'שם עצם',label:'Noms',color:'var(--teal)',icon:'🏛️',fr:'Personnes, lieux, objets'},
+  {key:'שם תואר',label:'Adjectifs',color:'var(--purple)',icon:'🎨',fr:'Qualités, couleurs, tailles'},
+  {key:'כינוי גוף',label:'Pronoms',color:'var(--orange)',icon:'👤',fr:'Personnels, possessifs'},
+  {key:'מילת יחס',label:'Prépositions',color:'var(--red)',icon:'🔗',fr:'Préfixes et particules'},
+  {key:'מילת שלילה',label:'Négations',color:'#c07050',icon:'🚫',fr:'לא, אין, שלא…'},
+  {key:'תואר הפועל',label:'Adverbes',color:'var(--green)',icon:'💨',fr:'Vite, déjà, seulement…'},
+  {key:'מילת תיאור',label:'Particules',color:'var(--ink2)',icon:'🔸',fr:'Mots invariables'},
+  {key:'מילת שאלה',label:'Interrogatifs',color:'var(--gold)',icon:'❓',fr:'מה, מי, מאיפה…'},
+  {key:'מילת השוואה',label:'Comparatifs',color:'var(--gold2)',icon:'⚖️',fr:'כמו, הכי…'},
+  {key:'מילת כלל',label:'Collectifs',color:'var(--cream)',icon:'∀',fr:'כל, וכל…'},
+  {key:'קריאה',label:'Interjections',color:'var(--green2)',icon:'😄',fr:'Exclamations'},
+  {key:'_other',label:'Autres',color:'var(--ink3)',icon:'📌',fr:'Non catégorisés'},
+];
+const MAIN_CATS=CAT_DEFS.filter(d=>d.key!=='_other').map(d=>d.key);
+
+function renderGrammar(){
+  const grid=document.getElementById('cat-grid');
+  if(!state.rawText){grid.innerHTML='<div style="color:var(--ink3)">Chargez un texte d\'abord.</div>';return}
+  if(!state.words.length){
+    grid.innerHTML='<div style="display:flex;align-items:center;gap:8px;color:var(--blue)"><div class="ai-dot"></div>Analyse en cours, patientez…</div>';
+    setTimeout(()=>{if(state.words.length)renderGrammar()},2000);
+    return;
+  }
+  grid.innerHTML='';
+  document.getElementById('cat-word-list').className='word-list';
+  CAT_DEFS.forEach(def=>{
+    const items=def.key==='_other'?state.words.filter(w=>!MAIN_CATS.includes(w.cat)):state.words.filter(w=>w.cat===def.key);
+    if(!items.length)return;
+    const card=document.createElement('div');card.className='cat-card';
+    card.innerHTML=`<div class="cat-header" style="background:${def.color}22;color:${def.color}">${def.icon} ${def.label}<span class="cat-count">${items.length}</span></div><div class="cat-preview">${def.fr}</div>`;
+    card.onclick=()=>openCat(def,items,card);
+    grid.appendChild(card);
+  });
+}
+
+function openCat(def,items,card){
+  document.querySelectorAll('.cat-card').forEach(c=>c.classList.remove('selected'));card.classList.add('selected');
+  const box=document.getElementById('cat-word-list');box.className='word-list open';
+  box.innerHTML=`<div style="font-size:11px;color:${def.color};margin-bottom:10px;text-transform:uppercase;letter-spacing:.1em">${def.icon} ${def.label} — ${items.length} mot(s)</div>`;
+  items.forEach(w=>{
+    const row=document.createElement('div');row.className='word-row';
+    const sh=w.heb.replace(/'/g,"\\'");
+    row.innerHTML=`<button class="btn-audio" onclick="playPhrase('${sh}','he')">🔊</button>
+      <div class="word-heb">${w.heb}</div>
+      <div class="word-fr">${w.fr||'—'}</div>
+      <div class="word-morph">${w.morph||'—'}${w.root?' <span style="color:var(--teal)">· '+w.root+'</span>':''}</div>
+      <span class="word-type">${w.cat}</span>`;
+    box.appendChild(row);
+  });
+  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ═══════════════════════════════════════════════════
+// LEXIQUE
+// ═══════════════════════════════════════════════════
+const CAT_COLORS={'פועל':'var(--blue)','שם עצם':'var(--teal)','שם תואר':'var(--purple)','כינוי גוף':'var(--orange)','מילת יחס':'var(--red)','מילת שלילה':'#c07050','תואר הפועל':'var(--green)','מילת תיאור':'var(--ink2)','מילת שאלה':'var(--gold)','מילת השוואה':'var(--gold2)','מילת כלל':'var(--cream)','קריאה':'var(--green2)'};
+
+function setLexFilter(cat,btn){
+  state.lexFilter=cat;
+  document.querySelectorAll('.lex-filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderLexicon();
+}
+
+function renderLexicon(){
+  const wrap=document.getElementById('lex-wrap');
+  if(!state.words.length){wrap.innerHTML='<div style="color:var(--ink3)">Chargez un texte d\'abord.</div>';return}
+  const q=(document.getElementById('lex-search').value||'').trim().toLowerCase();
+  let words=[...state.words];
+  if(state.lexFilter!=='all'){
+    if(state.lexFilter==='other') words=words.filter(w=>!MAIN_CATS.includes(w.cat));
+    else words=words.filter(w=>w.cat===state.lexFilter);
+  }
+  if(q) words=words.filter(w=>w.heb.includes(q)||w.fr.toLowerCase().includes(q)||(w.root&&w.root.includes(q)));
+  if(!words.length){wrap.innerHTML='<div style="color:var(--ink3);padding:16px">Aucun résultat.</div>';return}
+  const rows=words.map(w=>{
+    const c=CAT_COLORS[w.cat]||'var(--ink3)';
+    const sh=w.heb.replace(/'/g,"\\'");
+    return `<tr>
+      <td><button class="btn-audio" onclick="playPhrase('${sh}','he')" style="padding:2px 7px;font-size:11px">🔊</button></td>
+      <td class="lex-heb">${w.heb}</td>
+      <td style="color:var(--cream2)">${w.fr||'—'}</td>
+      <td class="lex-root">${w.root||'—'}</td>
+      <td style="font-size:12px;color:var(--ink3)">${w.morph||'—'}</td>
+      <td><span class="lex-badge" style="background:${c}22;color:${c}">${w.cat}</span></td>
+    </tr>`;
+  }).join('');
+  wrap.innerHTML=`<div style="font-size:12px;color:var(--ink3);margin-bottom:8px">${words.length} mot(s)</div>
+    <div style="overflow-x:auto"><table class="lex-table">
+      <thead><tr><th></th><th>Hébreu</th><th>Français</th><th>Racine</th><th>Morphologie</th><th>Catégorie</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// RECONSTRUCTION
+// ═══════════════════════════════════════════════════
+let _dragSrc=null;
+function renderReconstruction(){
+  const container=document.getElementById('recon-container');
+  if(!state.sentences.length){container.innerHTML='<div style="color:var(--ink3)">Chargez un texte d\'abord.</div>';return}
+  container.innerHTML='';
+  const frLines=state.translation?state.translation.split(/\n+/).map(s=>s.trim()).filter(Boolean):[];
+  const toShow=state.sentences.filter(s=>s.split(/\s+/).length>=3).slice(0,6);
+  if(!toShow.length){container.innerHTML='<div style="color:var(--ink3)">Phrases trop courtes.</div>';return}
+  toShow.forEach((sent,i)=>{
+    const words=sent.split(/\s+/).filter(Boolean);
+    const shuffled=[...words].sort(()=>Math.random()-.5);
+    const encoded=encodeURIComponent(sent);
+    const frLine=frLines[i];
+    const div=document.createElement('div');
+    div.innerHTML=`<div class="phrase-sentence">
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">Phrase ${i+1} — ${words.length} mots</div>
+      <div class="phrase-fr-hint">${frLine?'🇫🇷 '+frLine:'<span style="color:var(--ink3)">Traduction non disponible</span>'}</div>
+      <div style="font-size:12px;color:var(--ink3);margin-bottom:6px">⬇ Glisse ou clique les étiquettes :</div>
+      <div class="drop-target" id="drop-${i}" data-correct="${encoded}" ondragover="rcOver(event)" ondragleave="rcLeave(event)" ondrop="rcDrop(event,${i})"></div>
+      <div class="labels-pool" id="pool-${i}">${shuffled.map(w=>`<div class="label-tag" draggable="true" ondragstart="rcStart(event)" ondragend="rcEnd(event)" onclick="rcClick(this,${i})">${w}</div>`).join('')}</div>
+      <div class="phrase-check">
+        <button class="btn btn-gold btn-sm" onclick="checkRecon(${i})">✓ Vérifier</button>
+        <button class="btn btn-ghost btn-sm" onclick="resetRecon(${i})">↺</button>
+        <button class="btn-audio" onclick="playPhrase(decodeURIComponent('${encoded}'),'he')">🔊</button>
+        <div class="phrase-feedback" id="fb-${i}"></div>
+      </div></div>`;
+    container.appendChild(div);
+  });
+}
+function rcStart(e){_dragSrc=e.target;e.target.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',e.target.textContent)}
+function rcEnd(e){e.target.classList.remove('dragging')}
+function rcOver(e){e.preventDefault();e.currentTarget.classList.add('drag-over')}
+function rcLeave(e){e.currentTarget.classList.remove('drag-over')}
+function rcDrop(e,i){e.preventDefault();e.currentTarget.classList.remove('drag-over');if(_dragSrc){_dragSrc.classList.add('placed');e.currentTarget.appendChild(_dragSrc);_dragSrc=null}}
+function rcClick(el,i){
+  const pool=document.getElementById('pool-'+i),drop=document.getElementById('drop-'+i);
+  if(el.parentElement===pool){el.classList.add('placed');drop.appendChild(el)}
+  else{el.classList.remove('placed');pool.appendChild(el)}
+}
+function checkRecon(i){
+  const drop=document.getElementById('drop-'+i),fb=document.getElementById('fb-'+i);
+  const correct=decodeURIComponent(drop.dataset.correct);
+  const user=Array.from(drop.querySelectorAll('.label-tag')).map(t=>t.textContent).join(' ');
+  if(user===correct){fb.className='phrase-feedback correct';fb.textContent='✓ Exact !';playPhrase(correct,'he')}
+  else{fb.className='phrase-feedback wrong';fb.textContent='✗ Correct : '+correct}
+}
+function resetRecon(i){
+  const pool=document.getElementById('pool-'+i),drop=document.getElementById('drop-'+i);
+  Array.from(drop.querySelectorAll('.label-tag')).forEach(el=>{el.classList.remove('placed');pool.appendChild(el)});
+  document.getElementById('fb-'+i).className='phrase-feedback';
+}
+
+// ═══════════════════════════════════════════════════
+// PHRASES PERSO
+// ═══════════════════════════════════════════════════
+function addPhrase(){
+  const heb=document.getElementById('inp-heb').value.trim();
+  const fr=document.getElementById('inp-fr').value.trim();
+  const cat=document.getElementById('inp-cat').value.trim()||'personnel';
+  if(!heb){notify('Entrez une phrase en hébreu');return}
+  state.personalPhrases.push({heb,fr,cat,id:Date.now()});
+  document.getElementById('inp-heb').value='';document.getElementById('inp-fr').value='';document.getElementById('inp-cat').value='';
+  renderPhrases();notify('✓ Phrase ajoutée');
+}
+function renderPhrases(){
+  const list=document.getElementById('saved-list');
+  document.getElementById('personal-count').textContent=state.personalPhrases.length+' phrase(s) enregistrée(s)';
+  list.innerHTML='';
+  state.personalPhrases.forEach((p,i)=>{
+    const sh=p.heb.replace(/'/g,"\\'"),sf=(p.fr||'').replace(/'/g,"\\'");
+    const item=document.createElement('div');item.className='saved-phrase-item';
+    item.innerHTML=`<div style="flex:1"><div class="saved-phrase-heb">${p.heb}</div><div class="saved-phrase-fr">${p.fr||'—'}</div><div style="font-size:10px;color:var(--ink3);margin-top:2px">${p.cat}</div></div>
+      <div class="saved-phrase-actions">
+        <button class="btn-audio" onclick="playPhrase('${sh}','he')">🔊 HE</button>
+        <button class="btn-audio" style="border-color:var(--green2);color:var(--green)" onclick="playPhrase('${sf}','fr')">🔊 FR</button>
+        <button class="btn btn-ghost btn-sm" onclick="delPhrase(${i})">🗑</button>
+      </div>`;
+    list.appendChild(item);
+  });
+}
+function delPhrase(i){state.personalPhrases.splice(i,1);renderPhrases()}
+
+// ═══════════════════════════════════════════════════
+// SAVE / IMPORT / EXPORT
+// ═══════════════════════════════════════════════════
+function getExport(){return{version:'4.0',docName:state.docName,rawText:state.rawText,translation:state.translation,words:state.words,personalPhrases:state.personalPhrases,exportDate:new Date().toISOString()}}
+function downloadJSON(){downloadBlob(JSON.stringify(getExport(),null,2),'ivrit_drill_data.json','application/json');notify('⬇️ JSON téléchargé')}
+function downloadHTML(){downloadBlob(document.documentElement.outerHTML,'ivrit_drill_v4.html','text/html');notify('⬇️ HTML téléchargé')}
+function downloadBlob(content,filename,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),5000)}
+
+function importJSON(e){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      state.docName=d.docName||'Restauré';state.rawText=d.rawText||'';
+      state.translation=d.translation||'';state.words=d.words||[];
+      state.sentences=extractSentences(state.rawText);state.personalPhrases=d.personalPhrases||[];
+      if(state.rawText)document.getElementById('text-heb-box').textContent=state.rawText;
+      document.getElementById('doc-name').textContent=state.docName;
+      document.getElementById('status-text').textContent=state.sentences.length+' phrases · '+state.words.length+' mots';
+      updateFrBox();renderPhrases();
+      notify('✓ Restauré : '+state.docName);showPanel(state.rawText?'reader':'personal');
+    }catch(err){notify('⚠️ Erreur JSON : '+err.message)}
+  };
+  r.readAsText(file,'UTF-8');e.target.value='';
+}
+
+function copyText(txt){
+  if(!txt){notify('Rien à copier');return}
+  navigator.clipboard.writeText(txt).then(()=>notify('✓ Copié !')).catch(()=>{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);notify('✓ Copié')});
+}
+
+function notify(msg){const n=document.getElementById('notif');n.textContent=msg;n.style.display='block';clearTimeout(n._t);n._t=setTimeout(()=>n.style.display='none',3200)}
+
+// Auto-load גן נעול on startup
+window.addEventListener('load',()=>loadDemo());
+
+</script>
+</body>
+</html>
