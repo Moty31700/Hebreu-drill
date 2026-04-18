@@ -213,12 +213,6 @@ textarea{min-height:80px;resize:vertical}
     <button class="btn btn-ghost btn-sm" onclick="loadDemo()">📜 Démo : גן נעול — ביאליק</button>
   </div>
   <div class="divider"></div>
-  <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px">
-    <div style="font-size:13px;color:var(--gold);font-weight:600;margin-bottom:6px">📄 Charger un fichier HTML sauvegardé</div>
-    <p style="font-size:12px;color:var(--ink3);margin-bottom:8px">Rechargez un fichier HTML exporté depuis cette application pour restaurer tout l'état.</p>
-    <button class="btn btn-blue btn-sm" onclick="document.getElementById('html-input').click()">📂 Importer HTML</button>
-    <input type="file" id="html-input" accept=".html" onchange="importHTML(event)" style="display:none">
-  </div>
   <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px">
     <div style="font-size:13px;color:var(--gold);font-weight:600;margin-bottom:6px">↩️ Restaurer depuis un JSON</div>
     <button class="btn btn-blue btn-sm" onclick="document.getElementById('json-input').click()">📂 Importer JSON</button>
@@ -331,7 +325,7 @@ textarea{min-height:80px;resize:vertical}
       <div class="input-group">
         <label>Texte hébreu</label>
         <div style="display:flex;gap:7px;align-items:flex-start">
-          <textarea id="gram-text-heb" dir="rtl" placeholder="הכנס כאן טקסט עברי..." style="min-height:90px;font-family:'Noto Serif Hebrew',serif;font-size:17px;flex:1" oninput="syncGramToReader();updateClaudePrompt()"></textarea>
+          <textarea id="gram-text-heb" dir="rtl" placeholder="הכנס כאן טקסט עברי..." style="min-height:90px;font-family:'Noto Serif Hebrew',serif;font-size:17px;flex:1" oninput="syncGramToReader()"></textarea>
           <button class="btn btn-ghost btn-sm" onclick="pasteHebGram()" title="Coller depuis le presse-papiers" style="flex-shrink:0;margin-top:2px">⬇️ Coller</button>
         </div>
       </div>
@@ -343,16 +337,11 @@ textarea{min-height:80px;resize:vertical}
         </div>
       </div>
 
-      <!-- OPTION A : Analyser avec Claude -->
+      <!-- ANALYSE DIRECTE VIA API -->
       <div style="margin-top:14px;padding:12px;background:rgba(74,144,217,.08);border:1px solid var(--blue2);border-radius:8px">
-        <div style="font-size:12px;color:var(--blue);font-weight:600;margin-bottom:8px">🅐 Analyser avec Claude.ai</div>
-        <div style="font-size:11px;color:var(--ink3);margin-bottom:8px;line-height:1.6">
-          1. Choisissez la catégorie → cliquez <strong style="color:var(--gold)">📋 Copier le prompt</strong><br>
-          2. Ouvrez <a href="https://claude.ai" target="_blank" style="color:var(--blue)">claude.ai</a>, collez et envoyez<br>
-          3. Copiez le JSON produit → revenez ici → <strong style="color:var(--gold)">🅑 Importer</strong>
-        </div>
+        <div style="font-size:12px;color:var(--blue);font-weight:600;margin-bottom:10px">⚡ Analyser avec Claude (API directe)</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
-          <select id="gram-cat-select" style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--cream);font-family:'Source Serif 4',serif;font-size:13px;padding:5px 10px;outline:none" onchange="updateClaudePrompt()">
+          <select id="gram-cat-select" style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--cream);font-family:'Source Serif 4',serif;font-size:13px;padding:5px 10px;outline:none">
             <option value="morphologie">🔬 Morphologie complète</option>
             <option value="verbes">⚡ Verbes</option>
             <option value="noms">🏛️ Noms</option>
@@ -362,32 +351,17 @@ textarea{min-height:80px;resize:vertical}
             <option value="expressions">💬 Expressions</option>
             <option value="grammaire">📐 Grammaire générale</option>
           </select>
-          <button class="btn btn-blue btn-sm" onclick="copyClaudePrompt()">📋 Copier le prompt</button>
-          <button class="btn btn-ghost btn-sm" onclick="openClaudeAnalysis()">🔗 Ouvrir Claude.ai →</button>
+          <button class="btn btn-gold btn-sm" onclick="analyzeFullText()">🚀 Analyser</button>
           <button class="btn btn-ghost btn-sm" onclick="loadReaderTextToGram()">📥 Importer texte chargé</button>
         </div>
-        <!-- Boîte prompt visible -->
-        <div style="position:relative">
-          <div id="claude-prompt-box" style="background:#0a0908;border:1px solid var(--border);border-radius:6px;padding:10px 36px 10px 10px;font-family:monospace;font-size:11px;color:#88c090;white-space:pre-wrap;max-height:140px;overflow-y:auto;line-height:1.5;direction:ltr"></div>
-          <button class="btn-copy" style="position:absolute;top:6px;right:6px" onclick="copyClaudePrompt()">📋</button>
-        </div>
-      </div>
-
-      <!-- OPTION B : Importer JSON -->
-      <div style="margin-top:10px;padding:12px;background:rgba(212,168,75,.06);border:1px solid var(--gold3);border-radius:8px">
-        <div style="font-size:12px;color:var(--gold);font-weight:600;margin-bottom:8px">🅑 Importer résultat JSON depuis Claude</div>
-        <div style="font-size:11px;color:var(--ink3);margin-bottom:8px;line-height:1.6">
-          Copiez le JSON produit par Claude.ai et collez-le ici pour l'afficher dans l'application.
-        </div>
-        <div style="display:flex;gap:7px;align-items:flex-start">
-          <textarea id="gram-json-import" placeholder='{"titre":"...","categories":[...]}' style="min-height:80px;flex:1;font-family:monospace;font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--cream);padding:8px"></textarea>
-          <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
-            <button class="btn btn-ghost btn-sm" onclick="pasteJsonImport()">⬇️ Coller</button>
-            <button class="btn btn-gold btn-sm" onclick="importJsonAnalysis()">✓ Afficher</button>
-          </div>
+        <div style="font-size:11px;color:var(--ink3);line-height:1.6">
+          Clé API requise (🔑 Configuration) — le résultat s'affiche automatiquement et est ajouté au Lexique.
         </div>
       </div>
     </div>
+
+    <!-- Badge chargement (hors du div results) -->
+    <div class="ai-badge" id="gram-text-badge" style="display:none;margin-bottom:10px"><div class="ai-dot"></div><span>Analyse en cours…</span></div>
 
     <!-- Résultats par catégories -->
     <div id="gram-text-results" style="display:none">
@@ -636,7 +610,7 @@ function showPanel(name){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
   document.getElementById('nav-'+name).classList.add('active');
-  if(name==='grammar'){renderGrammar();updateClaudePrompt();}
+  if(name==='grammar'){renderGrammar();}
   if(name==='lexicon')renderLexicon();
   if(name==='reconstruction')renderReconstruction();
   if(name==='save')document.getElementById('save-preview').textContent=state.rawText||'—';
@@ -1187,180 +1161,63 @@ function resetAll(){
 }
 
 // ═══════════════════════════════════════════════════
-// IMPORTER HTML
-// ═══════════════════════════════════════════════════
-function importHTML(e){
-  const file=e.target.files[0];if(!file)return;
-  const r=new FileReader();
-  r.onload=ev=>{
-    try{
-      const parser=new DOMParser();
-      const doc=parser.parseFromString(ev.target.result,'text/html');
-      const docName=file.name.replace(/\.html?$/i,'');
-      const scripts=doc.querySelectorAll('script');
-      let found=false;
-
-      // 1. Chercher DEMO_HEB / DEMO_TRAD (format sauvegardé par cette app)
-      scripts.forEach(s=>{
-        if(found)return;
-        const m=s.textContent.match(/const DEMO_HEB\s*=\s*`([\s\S]*?)`/);
-        const mt=s.textContent.match(/const DEMO_TRAD\s*=\s*`([\s\S]*?)`/);
-        if(m&&m[1].trim()){
-          const heb=m[1].trim();
-          const trad=mt?mt[1].trim():'';
-          _loadTextCore(heb, docName);
-          state.words=[];
-          state.translation=trad;
-          if(trad)updateFrBox();
-          showPanel('reader');
-          if(state.inetOn&&!trad){autoTranslate(heb);autoAnalyze(heb);}
-          else if(state.inetOn){autoAnalyze(heb);}
-          notify('✓ HTML importé : '+docName);
-          found=true;
-        }
-      });
-
-      // 2. Fallback : extraire tout texte hébreu visible du body
-      if(!found){
-        const body=doc.body;
-        if(body){
-          const text=(body.innerText||body.textContent||'').trim();
-          const hebLines=text.split(/\n+/).map(l=>l.trim()).filter(l=>/[\u05D0-\u05EA]/.test(l)&&l.length>1);
-          if(hebLines.length){
-            loadText(hebLines.join('\n'), docName);
-            found=true;
-          }
-        }
-      }
-
-      if(!found)notify('⚠️ Aucun texte hébreu trouvé dans ce fichier HTML');
-    }catch(err){notify('⚠️ Erreur lecture HTML : '+err.message);console.error(err)}
-  };
-  r.readAsText(file,'UTF-8');e.target.value='';
-}
-
-// ═══════════════════════════════════════════════════
 // NORMALISATION CATÉGORIES (corrige le doublon Lexique)
 // ═══════════════════════════════════════════════════
 const CAT_NORM={
-  'verbes':'פועל','verbe':'פועל',
-  'noms':'שם עצם','nom':'שם עצם',
-  'adjectifs':'שם תואר','adjectif':'שם תואר',
-  'pronoms':'כינוי גוף','pronom':'כינוי גוף',
-  'prépositions':'מילת יחס','prepositions':'מילת יחס','préposition':'מילת יחס',
-  'négations':'מילת שלילה','negations':'מילת שלילה',
-  'adverbes':'תואר הפועל','adverbe':'תואר הפועל',
-  'particules':'מילת תיאור','particule':'מילת תיאור',
-  'interrogatifs':'מילת שאלה','interrogatif':'מילת שאלה',
-  'comparatifs':'מילת השוואה','comparatif':'מילת השוואה',
-  'interjections':'קריאה','interjection':'קריאה',
+  // Verbes
+  'פועל':'פועל','verbes':'פועל','verbe':'פועל','verb':'פועל','verbs':'פועל',
+  // Noms
+  'שם עצם':'שם עצם','noms':'שם עצם','nom':'שם עצם','noun':'שם עצם','nouns':'שם עצם',
+  'noms communs':'שם עצם','noms propres':'שם עצם','substantifs':'שם עצם',
+  // Adjectifs
+  'שם תואר':'שם תואר','adjectifs':'שם תואר','adjectif':'שם עצם',
+  // Pronoms
+  'כינוי גוף':'כינוי גוף','pronoms':'כינוי גוף','pronom':'כינוי גוף',
+  // Prépositions
+  'מילת יחס':'מילת יחס','prépositions':'מילת יחס','prepositions':'מילת יחס',
+  'préposition':'מילת יחס','preposition':'מילת יחס','particules prépositionnelles':'מילת יחס',
+  // Négations
+  'מילת שלילה':'מילת שלילה','négations':'מילת שלילה','negations':'מילת שלילה',
+  // Adverbes
+  'תואר הפועל':'תואר הפועל','adverbes':'תואר הפועל','adverbe':'תואר הפועל',
+  // Particules / invariables
+  'מילת תיאור':'מילת תיאור','particules':'מילת תיאור','particule':'מילת תיאור',
   'expressions':'מילת תיאור','expression':'מילת תיאור',
-  'grammaire':'מילת תיאור','morphologie':'מילת תיאור'
+  'grammaire':'מילת תיאור','morphologie':'מילת תיאור',
+  'mots invariables':'מילת תיאור','conjonctions':'מילת תיאור','conjonction':'מילת תיאור',
+  // Interrogatifs
+  'מילת שאלה':'מילת שאלה','interrogatifs':'מילת שאלה','interrogatif':'מילת שאלה',
+  'mots interrogatifs':'מילת שאלה',
+  // Comparatifs
+  'מילת השוואה':'מילת השוואה','comparatifs':'מילת השוואה','comparatif':'מילת השוואה',
+  // Collectifs
+  'מילת כלל':'מילת כלל',
+  // Interjections
+  'קריאה':'קריאה','interjections':'קריאה','interjection':'קריאה',
 };
+
 function normalizeCat(cat){
   if(!cat)return 'מילת תיאור';
   const k=cat.toLowerCase().trim();
-  return CAT_NORM[k]||cat;
-}
-
-// ═══════════════════════════════════════════════════
-// PROMPT CLAUDE — BOÎTE VISIBLE + COPIE
-// ═══════════════════════════════════════════════════
-function buildClaudePrompt(){
-  const heb=document.getElementById('gram-text-heb').value.trim()||'[Collez votre texte hébreu ci-dessus]';
-  const cat=document.getElementById('gram-cat-select').value;
-  const catLabels={morphologie:'morphologie complète (toutes catégories)',verbes:'verbes uniquement',noms:'noms uniquement',adjectifs:'adjectifs uniquement',pronoms:'pronoms uniquement',prepositions:'prépositions uniquement',expressions:'expressions et locutions',grammaire:'analyse grammaticale générale'};
-  return `Analyse ce texte hébreu — ${catLabels[cat]}.
-
-TEXTE HÉBREU :
-${heb}
-
-Réponds UNIQUEMENT avec un JSON valide (sans texte autour, sans backticks markdown) ayant cette structure exacte :
-{
-  "titre": "titre court descriptif",
-  "categories": [
-    {
-      "nom": "nom de la catégorie en français",
-      "couleur": "#4a90d9",
-      "items": [
-        {
-          "heb": "mot hébreu avec nikoud si possible",
-          "fr": "traduction française",
-          "racine": "racine trilitère א-ב-ג ou chaîne vide",
-          "morph": "analyse morphologique détaillée en français",
-          "note": "remarque pédagogique optionnelle"
-        }
-      ]
-    }
-  ],
-  "synthese": "paragraphe de synthèse en français"
-}
-
-Crée 2 à 5 catégories pertinentes. Sois précis et pédagogique. Le JSON doit être directement parseable.`;
-}
-
-function updateClaudePrompt(){
-  const box=document.getElementById('claude-prompt-box');
-  if(box)box.textContent=buildClaudePrompt();
-}
-
-function copyClaudePrompt(){
-  const p=buildClaudePrompt();
-  navigator.clipboard.writeText(p).then(()=>notify('✓ Prompt copié — collez-le dans Claude.ai')).catch(()=>{
-    const ta=document.createElement('textarea');ta.value=p;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);notify('✓ Prompt copié !');
-  });
-}
-
-function openClaudeAnalysis(){
-  const p=buildClaudePrompt();
-  const url='https://claude.ai/new?q='+encodeURIComponent(p);
-  window.open(url,'_blank','noopener');
-  notify('💡 Dans Claude.ai : envoyez, puis copiez le JSON et utilisez 🅑 Importer');
-}
-
-// ═══════════════════════════════════════════════════
-// OPTION B — IMPORTER JSON DEPUIS CLAUDE
-// ═══════════════════════════════════════════════════
-async function pasteJsonImport(){
-  try{
-    const text=await navigator.clipboard.readText();
-    if(!text){notify('Presse-papiers vide');return}
-    document.getElementById('gram-json-import').value=text;
-    notify('✓ JSON collé — cliquez ✓ Afficher');
-  }catch(e){
-    const txt=prompt('Collez le JSON ici :','');
-    if(txt)document.getElementById('gram-json-import').value=txt;
+  // Correspondance exacte
+  if(CAT_NORM[k])return CAT_NORM[k];
+  // Correspondance partielle : si la clé est contenue dans le nom de catégorie
+  for(const[key,val] of Object.entries(CAT_NORM)){
+    if(k.includes(key)||key.includes(k))return val;
   }
+  // Détection par mot-clé hébreu dans la chaîne
+  if(k.includes('פועל'))return 'פועל';
+  if(k.includes('שם עצם'))return 'שם עצם';
+  if(k.includes('שם תואר'))return 'שם תואר';
+  if(k.includes('כינוי'))return 'כינוי גוף';
+  if(k.includes('יחס'))return 'מילת יחס';
+  // Fallback
+  return cat;
 }
 
-function importJsonAnalysis(){
-  const raw=document.getElementById('gram-json-import').value.trim();
-  if(!raw){notify('Aucun JSON à importer');return}
-  let parsed;
-  try{
-    const clean=raw.replace(/```json|```/g,'').trim();
-    parsed=JSON.parse(clean);
-  }catch(e){notify('⚠️ JSON invalide : '+e.message);return}
-  if(!parsed.categories||!Array.isArray(parsed.categories)){
-    notify('⚠️ Format JSON incorrect — vérifiez la structure');return;
-  }
-  // Normaliser les catégories et alimenter le lexique
-  const newWords=[];
-  parsed.categories.forEach(cat=>{
-    const catKey=normalizeCat(cat.nom);
-    (cat.items||[]).forEach(item=>{
-      if(!state.words.find(w=>w.heb===item.heb)){
-        newWords.push({heb:item.heb,fr:item.fr||'',cat:catKey,morph:item.morph||'',root:item.racine||''});
-      }
-    });
-  });
-  if(newWords.length){
-    state.words=[...state.words,...newWords];
-    notify('✓ '+newWords.length+' mots ajoutés au lexique');
-  }
-  renderGramTextResults(parsed);
-  document.getElementById('gram-json-import').value='';
-}
+// ═══════════════════════════════════════════════════
+// ONGLETS GRAMMAIRE
+// ═══════════════════════════════════════════════════
 function setGramTab(tab){
   document.getElementById('gram-mode-words').style.display=tab==='words'?'':'none';
   document.getElementById('gram-mode-text').style.display=tab==='text'?'':'none';
@@ -1458,6 +1315,18 @@ Crée 2 à 4 catégories pertinentes selon le type d'analyse demandé. Sois pré
       return;
     }
     badge.style.display='none';
+    // Alimenter le lexique automatiquement
+    const newWords=[];
+    (parsed.categories||[]).forEach(cat=>{
+      const catKey=normalizeCat(cat.nom);
+      (cat.items||[]).forEach(item=>{
+        if(item.heb&&!state.words.find(w=>w.heb===item.heb)){
+          newWords.push({heb:item.heb,fr:item.fr||'',cat:catKey,morph:item.analyse||item.morph||'',root:item.racine||''});
+        }
+      });
+    });
+    if(newWords.length){state.words=[...state.words,...newWords];notify('✓ Analyse reçue — '+newWords.length+' mots ajoutés au lexique');}
+    else{notify('✓ Analyse reçue');}
     renderGramTextResults(parsed);
   }catch(e){
     badge.style.display='none';
