@@ -319,12 +319,12 @@ textarea{min-height:80px;resize:vertical}
       <div style="font-size:13px;color:var(--gold);font-weight:600;margin-bottom:10px">📝 Texte hébreu + traduction française à analyser</div>
       <div class="input-group">
         <label>Texte hébreu</label>
-        <textarea id="gram-text-heb" dir="rtl" placeholder="הכנס כאן טקסט עברי..." style="min-height:90px;font-family:'Noto Serif Hebrew',serif;font-size:17px"></textarea>
+        <textarea id="gram-text-heb" dir="rtl" placeholder="הכנס כאן טקסט עברי..." style="min-height:90px;font-family:'Noto Serif Hebrew',serif;font-size:17px" oninput="syncGramToReader()"></textarea>
       </div>
       <div class="input-group" style="margin-top:8px">
         <label>Traduction française <span style="color:var(--ink3);font-size:10px">(optionnel — collez depuis Google Translate)</span></label>
         <div style="display:flex;gap:7px;align-items:flex-start">
-          <textarea id="gram-text-fr" placeholder="Entrez ou collez la traduction française..." style="min-height:90px;flex:1"></textarea>
+          <textarea id="gram-text-fr" placeholder="Entrez ou collez la traduction française..." style="min-height:90px;flex:1" oninput="syncGramToReader()"></textarea>
           <button class="btn btn-ghost btn-sm" onclick="pasteFrGram()" title="Coller depuis le presse-papiers" style="flex-shrink:0;margin-top:2px">⬇️ Coller</button>
         </div>
       </div>
@@ -663,7 +663,7 @@ async function autoTranslate(text){
   box.textContent='Traduction automatique en cours…';box.style.color='var(--ink3)';box.style.fontStyle='italic';
   try{
     const r=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',headers:{'Content-Type':'application/json'},
+      method:'POST',headers:{'Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
         messages:[{role:'user',content:'Traduis ce texte hébreu en français naturel. Conserve les retours à la ligne. Réponds UNIQUEMENT avec la traduction, sans commentaires.\n\n'+text}]})
     });
@@ -695,7 +695,7 @@ ${text}
 Réponds UNIQUEMENT avec le JSON array brut, sans backticks, sans commentaires.`;
   try{
     const r=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',headers:{'Content-Type':'application/json'},
+      method:'POST',headers:{'Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
         messages:[{role:'user',content:prompt}]})
     });
@@ -986,10 +986,31 @@ async function pasteFrGram(){
     const text=await navigator.clipboard.readText();
     if(!text){notify('Presse-papiers vide');return}
     document.getElementById('gram-text-fr').value=text;
+    syncGramToReader();
     notify('✓ Traduction collée !');
   }catch(e){
     const txt=prompt('Collez votre traduction française ici :','');
-    if(txt)document.getElementById('gram-text-fr').value=txt;
+    if(txt){document.getElementById('gram-text-fr').value=txt;syncGramToReader();}
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// SYNC GRAMMAIRE → LECTEUR (automatique)
+// ═══════════════════════════════════════════════════
+function syncGramToReader(){
+  const heb=document.getElementById('gram-text-heb').value.trim();
+  const fr=document.getElementById('gram-text-fr').value.trim();
+  if(heb){
+    state.rawText=heb;
+    state.sentences=extractSentences(heb);
+    const box=document.getElementById('text-heb-box');
+    box.textContent=heb;
+    document.getElementById('doc-name').textContent='Texte saisi en grammaire';
+    document.getElementById('status-text').textContent=state.sentences.length+' phrase(s)';
+  }
+  if(fr){
+    state.translation=fr;
+    updateFrBox();
   }
 }
 
@@ -1061,7 +1082,7 @@ Crée 2 à 4 catégories pertinentes selon le type d'analyse demandé. Sois pré
   try{
     const resp=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages:[{role:'user',content:prompt}]})
     });
     const data=await resp.json();
