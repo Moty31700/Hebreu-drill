@@ -261,11 +261,12 @@ textarea{min-height:80px;resize:vertical}
         <span>🇫🇷 Traduction</span>
         <div style="display:flex;gap:5px">
           <button class="btn-copy" onclick="copyText(state.translation)">📋</button>
+          <button class="btn-copy" style="border-color:var(--green2);color:var(--green);background:rgba(46,112,64,.15)" onclick="pasteFr()" title="Coller depuis le presse-papiers (ex: Google Translate)">⬇️ Coller</button>
           <button class="btn-audio" style="border-color:var(--green2);color:var(--green)" onclick="readFr()">🔊</button>
           <button class="btn-erase" onclick="clearBox('fr')" title="Effacer">✕</button>
         </div>
       </div>
-      <div id="text-fr-box" style="color:var(--ink3);font-style:italic;font-size:13px">Traduction automatique après chargement.</div>
+      <div id="text-fr-box" style="color:var(--ink3);font-style:italic;font-size:13px">Traduction automatique après chargement.<br><span style="font-size:11px">💡 Copiez depuis Google Translate puis cliquez ⬇️ Coller</span></div>
     </div>
   </div>
   <div class="audio-controls">
@@ -280,40 +281,81 @@ textarea{min-height:80px;resize:vertical}
 
 <!-- GRAMMAR -->
 <div class="panel" id="panel-grammar">
-  <div class="panel-title">🔤 Analyse morphologique</div>
-  <div class="panel-sub">Analyse automatique par Claude — catégories, racines, formes verbales</div>
+  <div class="panel-title">🔤 Analyse grammaticale</div>
+  <div class="panel-sub">Analyse par catégories — mots isolés ou textes entiers hébreu-français</div>
 
-  <!-- BANDEAU INTERNET GRAMMAIRE -->
   <div class="inet-banner on" id="grammar-inet-banner" style="margin-bottom:10px">
     🌐 Connexion internet activée — analyse Claude et liens externes disponibles
   </div>
 
-  <!-- LIENS EXTERNES GRAMMAIRE -->
-  <div class="ext-links-box" id="grammar-ext-box">
-    <div class="ext-links-title">🔗 Analyse externe — cliquez sur un mot dans le lexique, puis ouvrez ici</div>
-    <div class="ext-links-row">
-      <button class="btn-ext btn-ext-pea" id="btn-pea-gram" onclick="openPealimWord()" title="Analyser le mot sélectionné sur Pealim">
-        📖 Pealim — Conjugaison complète
-      </button>
-      <button class="btn-ext btn-ext-morfix" id="btn-morfix-gram" onclick="openMorfixWord()" title="Chercher le mot dans Morfix">
-        📚 Morfix — Définition
-      </button>
-      <button class="btn-ext btn-ext-gt" id="btn-gt-gram" onclick="openGoogleTranslateWord()" title="Traduire le mot sélectionné">
-        🌍 Google Translate
-      </button>
-    </div>
-    <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
-      <label style="font-size:11px;color:var(--ink3)">Mot à analyser :</label>
-      <input type="text" id="word-input-gram" dir="rtl" placeholder="הַיּוֹם" style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--cream);font-family:'Noto Serif Hebrew',serif;font-size:16px;padding:4px 10px;width:140px;outline:none">
-    </div>
-    <div style="font-size:10px;color:var(--ink3);margin-top:5px">
-      💡 Tapez ou collez un mot hébreu, puis cliquez sur le lien externe souhaité
-    </div>
+  <!-- ONGLETS MODE -->
+  <div style="display:flex;gap:6px;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:10px">
+    <button class="btn btn-gold btn-sm" id="gram-tab-words" onclick="setGramTab('words')">🔡 Mot par mot</button>
+    <button class="btn btn-ghost btn-sm" id="gram-tab-text" onclick="setGramTab('text')">📄 Texte entier</button>
   </div>
 
-  <div class="ai-badge" id="grammar-badge" style="display:none;margin-bottom:12px"><div class="ai-dot"></div><span>Analyse en cours…</span></div>
-  <div class="cat-grid" id="cat-grid"><div style="color:var(--ink3)">Chargez un texte d'abord.</div></div>
-  <div id="cat-word-list" class="word-list"></div>
+  <!-- MODE MOT PAR MOT (existant) -->
+  <div id="gram-mode-words">
+    <div class="ext-links-box" id="grammar-ext-box">
+      <div class="ext-links-title">🔗 Analyse externe</div>
+      <div class="ext-links-row">
+        <button class="btn-ext btn-ext-pea" id="btn-pea-gram" onclick="openPealimWord()">📖 Pealim — Conjugaison</button>
+        <button class="btn-ext btn-ext-morfix" id="btn-morfix-gram" onclick="openMorfixWord()">📚 Morfix — Définition</button>
+        <button class="btn-ext btn-ext-gt" id="btn-gt-gram" onclick="openGoogleTranslateWord()">🌍 Google Translate</button>
+      </div>
+      <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
+        <label style="font-size:11px;color:var(--ink3)">Mot à analyser :</label>
+        <input type="text" id="word-input-gram" dir="rtl" placeholder="הַיּוֹם" style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--cream);font-family:'Noto Serif Hebrew',serif;font-size:16px;padding:4px 10px;width:140px;outline:none">
+      </div>
+    </div>
+    <div class="ai-badge" id="grammar-badge" style="display:none;margin-bottom:12px"><div class="ai-dot"></div><span>Analyse en cours…</span></div>
+    <div class="cat-grid" id="cat-grid"><div style="color:var(--ink3)">Chargez un texte d'abord.</div></div>
+    <div id="cat-word-list" class="word-list"></div>
+  </div>
+
+  <!-- MODE TEXTE ENTIER -->
+  <div id="gram-mode-text" style="display:none">
+    <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px">
+      <div style="font-size:13px;color:var(--gold);font-weight:600;margin-bottom:10px">📝 Texte hébreu + traduction française à analyser</div>
+      <div class="input-group">
+        <label>Texte hébreu</label>
+        <textarea id="gram-text-heb" dir="rtl" placeholder="הכנס כאן טקסט עברי..." style="min-height:90px;font-family:'Noto Serif Hebrew',serif;font-size:17px"></textarea>
+      </div>
+      <div class="input-group" style="margin-top:8px">
+        <label>Traduction française <span style="color:var(--ink3);font-size:10px">(optionnel — collez depuis Google Translate)</span></label>
+        <div style="display:flex;gap:7px;align-items:flex-start">
+          <textarea id="gram-text-fr" placeholder="Entrez ou collez la traduction française..." style="min-height:90px;flex:1"></textarea>
+          <button class="btn btn-ghost btn-sm" onclick="pasteFrGram()" title="Coller depuis le presse-papiers" style="flex-shrink:0;margin-top:2px">⬇️ Coller</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center">
+        <label style="font-size:11px;color:var(--ink3)">Catégorie :</label>
+        <select id="gram-cat-select" style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--cream);font-family:'Source Serif 4',serif;font-size:13px;padding:5px 10px;outline:none">
+          <option value="verbes">⚡ Verbes</option>
+          <option value="noms">🏛️ Noms</option>
+          <option value="adjectifs">🎨 Adjectifs</option>
+          <option value="pronoms">👤 Pronoms</option>
+          <option value="prepositions">🔗 Prépositions</option>
+          <option value="expressions">💬 Expressions</option>
+          <option value="grammaire">📐 Grammaire générale</option>
+          <option value="morphologie">🔬 Morphologie complète</option>
+        </select>
+        <button class="btn btn-gold" onclick="analyzeFullText()">🔍 Analyser</button>
+        <button class="btn btn-ghost btn-sm" onclick="loadReaderTextToGram()">📥 Importer texte chargé</button>
+      </div>
+    </div>
+
+    <div class="ai-badge" id="gram-text-badge" style="display:none;margin-bottom:12px"><div class="ai-dot"></div><span>Analyse en cours…</span></div>
+
+    <!-- Résultats par catégories -->
+    <div id="gram-text-results" style="display:none">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px" id="gram-cat-tabs"></div>
+      <div id="gram-cat-content"></div>
+    </div>
+    <div id="gram-text-placeholder" style="color:var(--ink3);font-style:italic;font-size:13px;padding:20px 0">
+      Entrez un texte hébreu et choisissez une catégorie d'analyse, puis cliquez sur Analyser.
+    </div>
+  </div>
 </div>
 
 <!-- LEXIQUE -->
@@ -920,6 +962,181 @@ function importJSON(e){
 function copyText(txt){
   if(!txt){notify('Rien à copier');return}
   navigator.clipboard.writeText(txt).then(()=>notify('✓ Copié !')).catch(()=>{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);notify('✓ Copié')});
+}
+
+// ═══════════════════════════════════════════════════
+// COLLER TRADUCTION FRANÇAISE
+// ═══════════════════════════════════════════════════
+async function pasteFr(){
+  try{
+    const text=await navigator.clipboard.readText();
+    if(!text){notify('Presse-papiers vide');return}
+    state.translation=text;
+    updateFrBox();
+    notify('✓ Traduction collée !');
+  }catch(e){
+    // Fallback : zone de saisie temporaire
+    const txt=prompt('Collez votre traduction française ici :','');
+    if(txt){state.translation=txt;updateFrBox();notify('✓ Traduction collée !');}
+  }
+}
+
+async function pasteFrGram(){
+  try{
+    const text=await navigator.clipboard.readText();
+    if(!text){notify('Presse-papiers vide');return}
+    document.getElementById('gram-text-fr').value=text;
+    notify('✓ Traduction collée !');
+  }catch(e){
+    const txt=prompt('Collez votre traduction française ici :','');
+    if(txt)document.getElementById('gram-text-fr').value=txt;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// ONGLETS GRAMMAIRE
+// ═══════════════════════════════════════════════════
+function setGramTab(tab){
+  document.getElementById('gram-mode-words').style.display=tab==='words'?'':'none';
+  document.getElementById('gram-mode-text').style.display=tab==='text'?'':'none';
+  document.getElementById('gram-tab-words').className='btn btn-sm '+(tab==='words'?'btn-gold':'btn-ghost');
+  document.getElementById('gram-tab-text').className='btn btn-sm '+(tab==='text'?'btn-gold':'btn-ghost');
+}
+
+function loadReaderTextToGram(){
+  if(!state.rawText){notify('Aucun texte chargé dans le lecteur');return}
+  document.getElementById('gram-text-heb').value=state.rawText;
+  if(state.translation)document.getElementById('gram-text-fr').value=state.translation;
+  notify('✓ Texte importé du lecteur');
+}
+
+// ═══════════════════════════════════════════════════
+// ANALYSE TEXTE ENTIER PAR CATÉGORIES
+// ═══════════════════════════════════════════════════
+async function analyzeFullText(){
+  const heb=document.getElementById('gram-text-heb').value.trim();
+  const fr=document.getElementById('gram-text-fr').value.trim();
+  const cat=document.getElementById('gram-cat-select').value;
+  if(!heb){notify('Entrez un texte hébreu');return}
+
+  const badge=document.getElementById('gram-text-badge');
+  const placeholder=document.getElementById('gram-text-placeholder');
+  const results=document.getElementById('gram-text-results');
+  badge.style.display='flex';placeholder.style.display='none';results.style.display='none';
+
+  const catLabels={
+    verbes:'⚡ Verbes',noms:'🏛️ Noms',adjectifs:'🎨 Adjectifs',
+    pronoms:'👤 Pronoms',prepositions:'🔗 Prépositions',
+    expressions:'💬 Expressions',grammaire:'📐 Grammaire générale',
+    morphologie:'🔬 Morphologie complète'
+  };
+
+  const prompt=`Tu es un expert en hébreu. Analyse ce texte hébreu${fr?' et sa traduction française':''} en te concentrant sur : ${catLabels[cat]}.
+
+TEXTE HÉBREU :
+${heb}
+${fr?`\nTRADUCTION FRANÇAISE :\n${fr}`:''}
+
+Réponds UNIQUEMENT en JSON valide, sans texte autour, avec cette structure :
+{
+  "titre": "titre court de l'analyse",
+  "categories": [
+    {
+      "nom": "nom de la catégorie",
+      "couleur": "#hexcouleur",
+      "items": [
+        {
+          "heb": "mot hébreu",
+          "fr": "traduction française",
+          "analyse": "analyse grammaticale détaillée",
+          "racine": "racine trilitère si applicable"
+        }
+      ]
+    }
+  ],
+  "synthese": "paragraphe de synthèse en français"
+}
+Crée 2 à 4 catégories pertinentes selon le type d'analyse demandé. Sois précis et pédagogique.`;
+
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await resp.json();
+    const raw=data.content.map(b=>b.text||'').join('');
+    const clean=raw.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
+    badge.style.display='none';
+    renderGramTextResults(parsed);
+  }catch(e){
+    badge.style.display='none';
+    placeholder.style.display='block';
+    placeholder.textContent='⚠️ Erreur d\'analyse : '+e.message;
+    notify('⚠️ Erreur : '+e.message);
+  }
+}
+
+function renderGramTextResults(data){
+  const tabs=document.getElementById('gram-cat-tabs');
+  const content=document.getElementById('gram-cat-content');
+  const results=document.getElementById('gram-text-results');
+
+  tabs.innerHTML='';
+  content.innerHTML='';
+
+  // Titre
+  const title=document.createElement('div');
+  title.style.cssText='font-family:"Playfair Display",serif;font-size:18px;color:var(--gold);margin-bottom:12px';
+  title.textContent=data.titre||'Analyse';
+  content.appendChild(title);
+
+  // Onglets catégories
+  data.categories.forEach((cat,i)=>{
+    const btn=document.createElement('button');
+    btn.className='lex-filter-btn'+(i===0?' active':'');
+    btn.style.borderColor=cat.couleur||'var(--gold)';
+    if(i===0)btn.style.color=cat.couleur||'var(--gold)';
+    btn.textContent=cat.nom+' ('+cat.items.length+')';
+    btn.onclick=()=>{
+      document.querySelectorAll('#gram-cat-tabs .lex-filter-btn').forEach(b=>{b.classList.remove('active');b.style.color='';});
+      btn.classList.add('active');btn.style.color=cat.couleur||'var(--gold)';
+      document.querySelectorAll('.gram-cat-panel').forEach(p=>p.style.display='none');
+      document.getElementById('gram-panel-'+i).style.display='block';
+    };
+    tabs.appendChild(btn);
+
+    // Panneau
+    const panel=document.createElement('div');
+    panel.id='gram-panel-'+i;
+    panel.className='gram-cat-panel';
+    panel.style.display=i===0?'block':'none';
+    panel.innerHTML=cat.items.map(item=>`
+      <div style="display:grid;grid-template-columns:160px 1fr 1fr auto;gap:10px;align-items:start;padding:10px 0;border-bottom:1px solid var(--bg3)">
+        <div style="font-family:'Noto Serif Hebrew',serif;font-size:22px;color:var(--cream);direction:rtl;text-align:right">${item.heb}</div>
+        <div>
+          <div style="font-size:13px;color:var(--ink2)">${item.fr}</div>
+          ${item.racine?`<div style="font-family:'Noto Serif Hebrew',serif;font-size:12px;color:var(--teal);direction:rtl">√ ${item.racine}</div>`:''}
+        </div>
+        <div style="font-size:12px;color:var(--ink3);font-style:italic;line-height:1.5">${item.analyse}</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <button class="btn-audio" onclick="playPhrase('${item.heb.replace(/'/g,"\\'")}','he')" style="font-size:11px;padding:3px 7px">🔊</button>
+          <button class="btn-audio" style="border-color:var(--green2);color:var(--green);font-size:11px;padding:3px 7px" onclick="playPhrase('${(item.fr||'').replace(/'/g,"\\'")}','fr')">🔊</button>
+        </div>
+      </div>`).join('');
+    content.appendChild(panel);
+  });
+
+  // Synthèse
+  if(data.synthese){
+    const syn=document.createElement('div');
+    syn.style.cssText='margin-top:16px;padding:12px 16px;background:rgba(212,168,75,.07);border-left:3px solid var(--gold3);border-radius:4px;font-size:13px;color:var(--cream2);line-height:1.7';
+    syn.innerHTML='<strong style="color:var(--gold)">Synthèse :</strong> '+data.synthese;
+    content.appendChild(syn);
+  }
+
+  results.style.display='block';
 }
 
 function notify(msg){const n=document.getElementById('notif');n.textContent=msg;n.style.display='block';clearTimeout(n._t);n._t=setTimeout(()=>n.style.display='none',3200)}
