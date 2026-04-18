@@ -318,7 +318,7 @@ textarea{min-height:80px;resize:vertical}
   <!-- MODE TEXTE ENTIER -->
   <div id="gram-mode-text" style="display:none">
     <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px">
-      <div style="font-size:13px;color:var(--gold);font-weight:600;margin-bottom:10px">📝 Texte hébreu + traduction française à analyser</div>
+      <div style="font-size:13px;color:var(--gold);font-weight:600;margin-bottom:10px">📝 Texte hébreu à analyser</div>
       <div class="input-group">
         <label>Texte hébreu</label>
         <div style="display:flex;gap:7px;align-items:flex-start">
@@ -327,30 +327,51 @@ textarea{min-height:80px;resize:vertical}
         </div>
       </div>
       <div class="input-group" style="margin-top:8px">
-        <label>Traduction française <span style="color:var(--ink3);font-size:10px">(optionnel — collez depuis Google Translate)</span></label>
+        <label>Traduction française <span style="color:var(--ink3);font-size:10px">(optionnel)</span></label>
         <div style="display:flex;gap:7px;align-items:flex-start">
-          <textarea id="gram-text-fr" placeholder="Entrez ou collez la traduction française..." style="min-height:90px;flex:1" oninput="syncGramToReader()"></textarea>
+          <textarea id="gram-text-fr" placeholder="Entrez ou collez la traduction française..." style="min-height:60px;flex:1" oninput="syncGramToReader()"></textarea>
           <button class="btn btn-ghost btn-sm" onclick="pasteFrGram()" title="Coller depuis le presse-papiers" style="flex-shrink:0;margin-top:2px">⬇️ Coller</button>
         </div>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center">
-        <label style="font-size:11px;color:var(--ink3)">Catégorie :</label>
-        <select id="gram-cat-select" style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--cream);font-family:'Source Serif 4',serif;font-size:13px;padding:5px 10px;outline:none">
-          <option value="verbes">⚡ Verbes</option>
-          <option value="noms">🏛️ Noms</option>
-          <option value="adjectifs">🎨 Adjectifs</option>
-          <option value="pronoms">👤 Pronoms</option>
-          <option value="prepositions">🔗 Prépositions</option>
-          <option value="expressions">💬 Expressions</option>
-          <option value="grammaire">📐 Grammaire générale</option>
-          <option value="morphologie">🔬 Morphologie complète</option>
-        </select>
-        <button class="btn btn-gold" onclick="analyzeFullText()">🔍 Analyser</button>
-        <button class="btn btn-ghost btn-sm" onclick="loadReaderTextToGram()">📥 Importer texte chargé</button>
+
+      <!-- OPTION A : Analyser avec Claude -->
+      <div style="margin-top:14px;padding:12px;background:rgba(74,144,217,.08);border:1px solid var(--blue2);border-radius:8px">
+        <div style="font-size:12px;color:var(--blue);font-weight:600;margin-bottom:8px">🅐 Analyser avec Claude.ai</div>
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:8px;line-height:1.6">
+          Cliquez → Claude.ai s'ouvre avec votre texte et le prompt d'analyse prêt.<br>
+          Copiez le JSON produit, revenez ici et utilisez <strong style="color:var(--gold)">🅑 Importer</strong>.
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <select id="gram-cat-select" style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--cream);font-family:'Source Serif 4',serif;font-size:13px;padding:5px 10px;outline:none">
+            <option value="morphologie">🔬 Morphologie complète</option>
+            <option value="verbes">⚡ Verbes</option>
+            <option value="noms">🏛️ Noms</option>
+            <option value="adjectifs">🎨 Adjectifs</option>
+            <option value="pronoms">👤 Pronoms</option>
+            <option value="prepositions">🔗 Prépositions</option>
+            <option value="expressions">💬 Expressions</option>
+            <option value="grammaire">📐 Grammaire générale</option>
+          </select>
+          <button class="btn btn-blue" onclick="openClaudeAnalysis()">🤖 Analyser avec Claude →</button>
+          <button class="btn btn-ghost btn-sm" onclick="loadReaderTextToGram()">📥 Importer texte chargé</button>
+        </div>
+      </div>
+
+      <!-- OPTION B : Importer JSON -->
+      <div style="margin-top:10px;padding:12px;background:rgba(212,168,75,.06);border:1px solid var(--gold3);border-radius:8px">
+        <div style="font-size:12px;color:var(--gold);font-weight:600;margin-bottom:8px">🅑 Importer résultat JSON depuis Claude</div>
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:8px;line-height:1.6">
+          Copiez le JSON produit par Claude.ai et collez-le ici pour l'afficher dans l'application.
+        </div>
+        <div style="display:flex;gap:7px;align-items:flex-start">
+          <textarea id="gram-json-import" placeholder='{"titre":"...","categories":[...]}' style="min-height:80px;flex:1;font-family:monospace;font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--cream);padding:8px"></textarea>
+          <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
+            <button class="btn btn-ghost btn-sm" onclick="pasteJsonImport()">⬇️ Coller</button>
+            <button class="btn btn-gold btn-sm" onclick="importJsonAnalysis()">✓ Afficher</button>
+          </div>
+        </div>
       </div>
     </div>
-
-    <div class="ai-badge" id="gram-text-badge" style="display:none;margin-bottom:12px"><div class="ai-dot"></div><span>Analyse en cours…</span></div>
 
     <!-- Résultats par catégories -->
     <div id="gram-text-results" style="display:none">
@@ -358,7 +379,7 @@ textarea{min-height:80px;resize:vertical}
       <div id="gram-cat-content"></div>
     </div>
     <div id="gram-text-placeholder" style="color:var(--ink3);font-style:italic;font-size:13px;padding:20px 0">
-      Entrez un texte hébreu et choisissez une catégorie d'analyse, puis cliquez sur Analyser.
+      Entrez un texte hébreu, ouvrez Claude pour l'analyser, puis importez le JSON ici.
     </div>
   </div>
 </div>
@@ -903,29 +924,45 @@ function renderReconstruction(){
   const container=document.getElementById('recon-container');
   if(!state.sentences.length){container.innerHTML='<div style="color:var(--ink3)">Chargez un texte d\'abord.</div>';return}
   container.innerHTML='';
-  const frLines=state.translation?state.translation.split(/\n+/).map(s=>s.trim()).filter(Boolean):[];
-  const toShow=state.sentences.filter(s=>s.split(/\s+/).length>=3).slice(0,6);
+  // Trouver les traductions correspondantes mot à mot depuis state.words
+  const toShow=state.sentences.filter(s=>s.split(/\s+/).length>=2).slice(0,8);
   if(!toShow.length){container.innerHTML='<div style="color:var(--ink3)">Phrases trop courtes.</div>';return}
   toShow.forEach((sent,i)=>{
     const words=sent.split(/\s+/).filter(Boolean);
     const shuffled=[...words].sort(()=>Math.random()-.5);
     const encoded=encodeURIComponent(sent);
-    const frLine=frLines[i];
+    // Traduction courte : uniquement les mots du groupe depuis le lexique
+    const frWords=words.map(w=>{
+      const found=state.words.find(wd=>wd.heb===w||wd.heb.replace(/[^\u05D0-\u05EA]/g,'')===w.replace(/[^\u05D0-\u05EA]/g,''));
+      return found?found.fr:'';
+    }).filter(Boolean);
+    const frShort=frWords.join(' · ');
     const div=document.createElement('div');
     div.innerHTML=`<div class="phrase-sentence">
-      <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">Phrase ${i+1} — ${words.length} mots</div>
-      <div class="phrase-fr-hint">${frLine?'🇫🇷 '+frLine:'<span style="color:var(--ink3)">Traduction non disponible</span>'}</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="font-size:11px;color:var(--ink3)">Groupe ${i+1}</span>
+        <button class="btn-audio" onclick="speakWordCount(${words.length},'${encoded}')" title="Écouter : nombre de mots + phrase">🔊 ${words.length} mots</button>
+        ${frShort?`<span style="font-size:12px;color:var(--cream2);font-style:italic">${frShort}</span>`:''}
+      </div>
       <div style="font-size:12px;color:var(--ink3);margin-bottom:6px">⬇ Glisse ou clique les étiquettes :</div>
       <div class="drop-target" id="drop-${i}" data-correct="${encoded}" ondragover="rcOver(event)" ondragleave="rcLeave(event)" ondrop="rcDrop(event,${i})"></div>
       <div class="labels-pool" id="pool-${i}">${shuffled.map(w=>`<div class="label-tag" draggable="true" ondragstart="rcStart(event)" ondragend="rcEnd(event)" onclick="rcClick(this,${i})">${w}</div>`).join('')}</div>
       <div class="phrase-check">
         <button class="btn btn-gold btn-sm" onclick="checkRecon(${i})">✓ Vérifier</button>
         <button class="btn btn-ghost btn-sm" onclick="resetRecon(${i})">↺</button>
-        <button class="btn-audio" onclick="playPhrase(decodeURIComponent('${encoded}'),'he')">🔊</button>
+        <button class="btn-audio" onclick="playPhrase(decodeURIComponent('${encoded}'),'he')">🔊 Phrase</button>
         <div class="phrase-feedback" id="fb-${i}"></div>
       </div></div>`;
     container.appendChild(div);
   });
+}
+
+function speakWordCount(n, encoded){
+  const msg=new SpeechSynthesisUtterance(n+' mots');
+  msg.lang='fr-FR';msg.rate=0.9;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(msg);
+  msg.onend=()=>playPhrase(decodeURIComponent(encoded),'he');
 }
 function rcStart(e){_dragSrc=e.target;e.target.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',e.target.textContent)}
 function rcEnd(e){e.target.classList.remove('dragging')}
@@ -1107,8 +1144,89 @@ function syncGramToReader(){
 }
 
 // ═══════════════════════════════════════════════════
-// ONGLETS GRAMMAIRE
+// OPTION A — OUVRIR CLAUDE.AI AVEC PROMPT
 // ═══════════════════════════════════════════════════
+function openClaudeAnalysis(){
+  const heb=document.getElementById('gram-text-heb').value.trim();
+  if(!heb){notify('Entrez d\'abord un texte hébreu');return}
+  const cat=document.getElementById('gram-cat-select').value;
+  const catLabels={morphologie:'morphologie complète (toutes catégories)',verbes:'verbes uniquement',noms:'noms uniquement',adjectifs:'adjectifs uniquement',pronoms:'pronoms uniquement',prepositions:'prépositions uniquement',expressions:'expressions et locutions',grammaire:'analyse grammaticale générale'};
+  const prompt=`Analyse ce texte hébreu — ${catLabels[cat]}.
+
+TEXTE HÉBREU :
+${heb}
+
+Réponds UNIQUEMENT avec un JSON valide (sans texte autour, sans backticks) ayant cette structure exacte :
+{
+  "titre": "titre court descriptif",
+  "categories": [
+    {
+      "nom": "nom de la catégorie en français",
+      "couleur": "#hexcouleur",
+      "items": [
+        {
+          "heb": "mot hébreu avec nikoud si possible",
+          "fr": "traduction française",
+          "racine": "racine trilitère א-ב-ג ou vide",
+          "morph": "analyse morphologique en français",
+          "note": "remarque pédagogique optionnelle"
+        }
+      ]
+    }
+  ],
+  "synthese": "paragraphe de synthèse en français"
+}`;
+  const url='https://claude.ai/new?q='+encodeURIComponent(prompt);
+  window.open(url,'_blank','noopener');
+  notify('💡 Copiez le JSON produit par Claude, puis utilisez 🅑 Importer');
+}
+
+// ═══════════════════════════════════════════════════
+// OPTION B — IMPORTER JSON DEPUIS CLAUDE
+// ═══════════════════════════════════════════════════
+async function pasteJsonImport(){
+  try{
+    const text=await navigator.clipboard.readText();
+    if(!text){notify('Presse-papiers vide');return}
+    document.getElementById('gram-json-import').value=text;
+    notify('✓ JSON collé — cliquez ✓ Afficher');
+  }catch(e){
+    const txt=prompt('Collez le JSON ici :','');
+    if(txt)document.getElementById('gram-json-import').value=txt;
+  }
+}
+
+function importJsonAnalysis(){
+  const raw=document.getElementById('gram-json-import').value.trim();
+  if(!raw){notify('Aucun JSON à importer');return}
+  let parsed;
+  try{
+    const clean=raw.replace(/```json|```/g,'').trim();
+    parsed=JSON.parse(clean);
+  }catch(e){
+    notify('⚠️ JSON invalide : '+e.message);
+    return;
+  }
+  if(!parsed.categories||!Array.isArray(parsed.categories)){
+    notify('⚠️ Format JSON incorrect — vérifiez la structure');
+    return;
+  }
+  // Alimenter aussi le lexique avec les items
+  const newWords=[];
+  parsed.categories.forEach(cat=>{
+    (cat.items||[]).forEach(item=>{
+      if(!state.words.find(w=>w.heb===item.heb)){
+        newWords.push({heb:item.heb,fr:item.fr,cat:cat.nom,morph:item.morph||'',root:item.racine||''});
+      }
+    });
+  });
+  if(newWords.length){
+    state.words=[...state.words,...newWords];
+    notify('✓ '+newWords.length+' mots ajoutés au lexique');
+  }
+  renderGramTextResults(parsed);
+  document.getElementById('gram-json-import').value='';
+}
 function setGramTab(tab){
   document.getElementById('gram-mode-words').style.display=tab==='words'?'':'none';
   document.getElementById('gram-mode-text').style.display=tab==='text'?'':'none';
