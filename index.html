@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ivrit-Drill · גן נעול — ביאליק</title>
+<title>עִבְרִית-דְּרִיל · גן נעול — ביאליק</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Hebrew:wght@400;700;900&family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0f0d0b;--bg2:#1a1710;--bg3:#252219;--panel:#1e1b14;--panel2:#2a2620;--border:#3d3828;--gold:#d4a84b;--gold2:#f0c96a;--gold3:#8a6a20;--cream:#f5e9c8;--cream2:#e8d5a0;--ink:#f0e8d0;--ink2:#b8a880;--ink3:#7a6a50;--blue:#4a90d9;--blue2:#2d5f9a;--green:#5aab6a;--green2:#2e7040;--red:#d45a4a;--purple:#9a6adb;--orange:#e8834a;--teal:#4aaba0}
@@ -14,6 +14,17 @@ body{font-family:'Source Serif 4',Georgia,serif;background:var(--bg);color:var(-
 .header-heb{font-family:'Noto Serif Hebrew',serif;font-size:26px;font-weight:900;color:var(--gold);direction:rtl;text-shadow:0 0 20px rgba(212,168,75,.4)}
 .header-fr{font-size:11px;color:var(--ink3);letter-spacing:.15em;text-transform:uppercase}
 #status-text{color:var(--gold2);font-size:13px}#doc-name{font-size:11px;color:var(--ink3);margin-top:2px}
+/* TOGGLE INTERNET */
+.inet-toggle-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;margin-left:16px}
+.inet-label{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+.toggle-switch{position:relative;width:44px;height:22px;cursor:pointer}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--bg3);border:1px solid var(--border);border-radius:22px;transition:.3s}
+.toggle-slider::before{content:'';position:absolute;width:16px;height:16px;left:2px;top:2px;background:var(--ink3);border-radius:50%;transition:.3s}
+.toggle-switch input:checked+.toggle-slider{background:rgba(90,171,106,.25);border-color:var(--green)}
+.toggle-switch input:checked+.toggle-slider::before{transform:translateX(22px);background:var(--green)}
+.inet-status{font-size:9px;font-weight:700;letter-spacing:.05em}
+.inet-status.on{color:var(--green)}.inet-status.off{color:var(--red)}
 #app-body{display:flex;flex:1;overflow:hidden}
 #sidebar{width:200px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
 .nav-section-title{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink3);padding:12px 16px 5px;border-top:1px solid var(--border)}
@@ -32,6 +43,11 @@ body{font-family:'Source Serif 4',Georgia,serif;background:var(--bg);color:var(-
 .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--ink2)}.btn-ghost:hover{border-color:var(--gold3);color:var(--cream)}
 .btn-blue{background:var(--blue2);border:1px solid var(--blue);color:var(--cream)}.btn-blue:hover{filter:brightness(1.2)}
 .btn-green{background:var(--green2);border:1px solid var(--green);color:var(--cream)}
+.btn-ext{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:6px;border:1px solid;font-family:'Source Serif 4',serif;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .18s}
+.btn-ext-gt{background:rgba(66,133,244,.12);border-color:#4285f4;color:#6ab4ff}.btn-ext-gt:hover{background:rgba(66,133,244,.25)}
+.btn-ext-pea{background:rgba(90,171,106,.12);border-color:var(--green);color:var(--green)}.btn-ext-pea:hover{background:rgba(90,171,106,.25)}
+.btn-ext-morfix{background:rgba(154,106,219,.12);border-color:var(--purple);color:var(--purple)}.btn-ext-morfix:hover{background:rgba(154,106,219,.25)}
+.btn-ext.disabled{opacity:.35;cursor:not-allowed;pointer-events:none}
 .btn-audio{background:var(--panel2);border:1px solid var(--blue2);color:var(--blue);padding:5px 11px;border-radius:4px;font-size:12px;cursor:pointer;font-family:'Source Serif 4',serif;font-weight:600;transition:all .18s}.btn-audio:hover{background:var(--blue2);color:var(--cream)}
 .btn-erase{background:var(--panel2);border:1px solid var(--red);color:var(--red);padding:5px 11px;border-radius:4px;font-size:12px;cursor:pointer;font-family:'Source Serif 4',serif;font-weight:600;transition:all .18s}.btn-erase:hover{background:rgba(212,90,74,.2)}
 .btn-sm{padding:5px 12px;font-size:12px}.btn-xs{padding:3px 8px;font-size:11px}
@@ -48,6 +64,14 @@ textarea{min-height:80px;resize:vertical}
 #drop-zone:hover,#drop-zone.drag-over{border-color:var(--gold);background:var(--panel2)}
 #drop-zone .drop-icon{font-size:32px;margin-bottom:8px}#drop-zone p{color:var(--ink2);font-size:14px}#drop-zone strong{color:var(--gold)}
 #file-input,#json-input{display:none}
+/* INET BANNER */
+.inet-banner{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:6px;font-size:12px;margin-bottom:14px}
+.inet-banner.on{background:rgba(90,171,106,.08);border:1px solid rgba(90,171,106,.3);color:var(--green)}
+.inet-banner.off{background:rgba(212,90,74,.08);border:1px solid rgba(212,90,74,.3);color:var(--red)}
+/* EXT LINKS BOX */
+.ext-links-box{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:14px}
+.ext-links-title{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink3);margin-bottom:8px}
+.ext-links-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 /* LOADING OVERLAY */
 .loading-overlay{position:fixed;inset:0;background:rgba(15,13,11,.85);z-index:900;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px}
 .loading-overlay.active{display:flex}
@@ -74,7 +98,7 @@ textarea{min-height:80px;resize:vertical}
 .cat-count{font-size:11px;background:rgba(255,255,255,.1);border-radius:10px;padding:1px 7px}
 .cat-preview{padding:4px 13px 9px;font-size:12px;color:var(--ink3);font-style:italic}
 .word-list{display:none;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:10px}.word-list.open{display:block}
-.word-row{display:grid;grid-template-columns:auto 120px 1fr 1fr auto;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--bg3)}.word-row:last-child{border-bottom:none}
+.word-row{display:grid;grid-template-columns:auto 120px 1fr 1fr auto auto;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--bg3)}.word-row:last-child{border-bottom:none}
 .word-heb{font-family:'Noto Serif Hebrew',serif;font-size:20px;font-weight:700;color:var(--cream);direction:rtl;text-align:right}
 .word-fr{font-size:13px;color:var(--ink2)}.word-morph{font-size:10px;color:var(--teal);font-style:italic;line-height:1.3}
 .word-type{font-size:10px;color:var(--ink3);background:var(--bg3);padding:2px 6px;border-radius:10px;text-transform:uppercase;white-space:nowrap;text-align:center}
@@ -97,7 +121,7 @@ textarea{min-height:80px;resize:vertical}
 .drop-target{min-height:48px;border:2px dashed var(--border);border-radius:6px;padding:7px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px;direction:rtl;transition:background .15s}
 .drop-target.drag-over{background:rgba(212,168,75,.05);border-color:var(--gold3)}
 .labels-pool{display:flex;flex-wrap:wrap;gap:6px;direction:rtl;padding:6px 0 8px;border-top:1px dashed var(--border);margin-top:4px}
-.label-tag{font-family:'Noto Serif Hebrew',serif;font-size:16px;padding:4px 11px;background:var(--panel2);border:1px solid var(--border);border-radius:4px;cursor:grab;user-select:none;transition:all .15s;color:var(--cream)}
+.label-tag{font-family:'Noto Serif Hebrew',serif;font-size:16px;padding:4px 11px;background:var(--panel2);border:1px solid var(--border);border-radius:4px;cursor:grab;user-select:none;transition:all .15px;color:var(--cream)}
 .label-tag:hover{border-color:var(--gold3)}.label-tag.dragging{opacity:.35}.label-tag.placed{background:var(--blue2);border-color:var(--blue)}
 .phrase-check{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:7px}
 .phrase-feedback{font-size:13px;padding:4px 10px;border-radius:4px;display:none}
@@ -125,8 +149,26 @@ textarea{min-height:80px;resize:vertical}
 </div>
 
 <div id="app-header">
-  <div><div class="header-heb">אִיבְרִית-דְּרִיל</div><div class="header-fr">Ivrit-Drill · Apprentissage Hébreu</div></div>
-  <div style="text-align:right"><div id="status-text">Prêt</div><div id="doc-name">Aucun document chargé</div></div>
+  <div>
+    <!-- TITRE CORRIGÉ : עִבְרִית avec ע et non א -->
+    <div class="header-heb">עִבְרִית-דְּרִיל</div>
+    <div class="header-fr">Ivrit-Drill · Apprentissage Hébreu</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px">
+    <!-- TOGGLE INTERNET -->
+    <div class="inet-toggle-wrap">
+      <div class="inet-label">Internet</div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="inet-toggle" checked onchange="toggleInet(this.checked)">
+        <span class="toggle-slider"></span>
+      </label>
+      <div class="inet-status on" id="inet-status-label">EN LIGNE</div>
+    </div>
+    <div style="text-align:right">
+      <div id="status-text">Prêt</div>
+      <div id="doc-name">Aucun document chargé</div>
+    </div>
+  </div>
 </div>
 
 <div id="app-body">
@@ -177,6 +219,31 @@ textarea{min-height:80px;resize:vertical}
 <div class="panel" id="panel-reader">
   <div class="panel-title">📖 Lecteur &amp; Audio</div>
   <div class="panel-sub">Hébreu et traduction côte à côte — lecture audio des deux langues</div>
+
+  <!-- BANDEAU INTERNET -->
+  <div class="inet-banner on" id="reader-inet-banner">
+    🌐 Connexion internet activée — traduction et liens externes disponibles
+  </div>
+
+  <!-- LIENS EXTERNES : Google Translate + Pealim -->
+  <div class="ext-links-box" id="reader-ext-box">
+    <div class="ext-links-title">🔗 Outils externes (s'ouvrent dans un nouvel onglet)</div>
+    <div class="ext-links-row">
+      <button class="btn-ext btn-ext-gt" id="btn-gt" onclick="openGoogleTranslate()" title="Ouvrir Google Translate avec le texte hébreu chargé">
+        🌍 Google Translate
+      </button>
+      <button class="btn-ext btn-ext-pea" id="btn-pea" onclick="openPealim()" title="Analyse grammaticale sur Pealim (verbes hébreux)">
+        📖 Pealim — Verbes
+      </button>
+      <button class="btn-ext btn-ext-morfix" id="btn-morfix" onclick="openMorfix()" title="Dictionnaire Morfix hébreu-français">
+        📚 Morfix — Dictionnaire
+      </button>
+    </div>
+    <div style="font-size:10px;color:var(--ink3);margin-top:7px">
+      💡 Google Translate envoie le texte hébreu chargé · Pealim et Morfix ouvrent leur page d'accueil pour analyse manuelle
+    </div>
+  </div>
+
   <div class="reader-cols">
     <div class="reader-col">
       <div class="reader-col-label">
@@ -215,6 +282,35 @@ textarea{min-height:80px;resize:vertical}
 <div class="panel" id="panel-grammar">
   <div class="panel-title">🔤 Analyse morphologique</div>
   <div class="panel-sub">Analyse automatique par Claude — catégories, racines, formes verbales</div>
+
+  <!-- BANDEAU INTERNET GRAMMAIRE -->
+  <div class="inet-banner on" id="grammar-inet-banner" style="margin-bottom:10px">
+    🌐 Connexion internet activée — analyse Claude et liens externes disponibles
+  </div>
+
+  <!-- LIENS EXTERNES GRAMMAIRE -->
+  <div class="ext-links-box" id="grammar-ext-box">
+    <div class="ext-links-title">🔗 Analyse externe — cliquez sur un mot dans le lexique, puis ouvrez ici</div>
+    <div class="ext-links-row">
+      <button class="btn-ext btn-ext-pea" id="btn-pea-gram" onclick="openPealimWord()" title="Analyser le mot sélectionné sur Pealim">
+        📖 Pealim — Conjugaison complète
+      </button>
+      <button class="btn-ext btn-ext-morfix" id="btn-morfix-gram" onclick="openMorfixWord()" title="Chercher le mot dans Morfix">
+        📚 Morfix — Définition
+      </button>
+      <button class="btn-ext btn-ext-gt" id="btn-gt-gram" onclick="openGoogleTranslateWord()" title="Traduire le mot sélectionné">
+        🌍 Google Translate
+      </button>
+    </div>
+    <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
+      <label style="font-size:11px;color:var(--ink3)">Mot à analyser :</label>
+      <input type="text" id="word-input-gram" dir="rtl" placeholder="הַיּוֹם" style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--cream);font-family:'Noto Serif Hebrew',serif;font-size:16px;padding:4px 10px;width:140px;outline:none">
+    </div>
+    <div style="font-size:10px;color:var(--ink3);margin-top:5px">
+      💡 Tapez ou collez un mot hébreu, puis cliquez sur le lien externe souhaité
+    </div>
+  </div>
+
   <div class="ai-badge" id="grammar-badge" style="display:none;margin-bottom:12px"><div class="ai-dot"></div><span>Analyse en cours…</span></div>
   <div class="cat-grid" id="cat-grid"><div style="color:var(--ink3)">Chargez un texte d'abord.</div></div>
   <div id="cat-word-list" class="word-list"></div>
@@ -341,7 +437,87 @@ const DEMO_WORDS=[
 // ═══════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════
-const state={rawText:'',sentences:[],words:[],personalPhrases:[],docName:'',translation:'',lexFilter:'all'};
+const state={rawText:'',sentences:[],words:[],personalPhrases:[],docName:'',translation:'',lexFilter:'all',inetOn:true};
+
+// ═══════════════════════════════════════════════════
+// TOGGLE INTERNET
+// ═══════════════════════════════════════════════════
+function toggleInet(on){
+  state.inetOn=on;
+  const label=document.getElementById('inet-status-label');
+  label.textContent=on?'EN LIGNE':'HORS LIGNE';
+  label.className='inet-status '+(on?'on':'off');
+
+  // Bandeaux
+  ['reader-inet-banner','grammar-inet-banner'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.className='inet-banner '+(on?'on':'off');
+    el.textContent=on
+      ?'🌐 Connexion internet activée — traduction et liens externes disponibles'
+      :'📴 Connexion internet désactivée — seules les fonctions locales sont actives';
+  });
+
+  // Boutons externes
+  ['btn-gt','btn-pea','btn-morfix','btn-pea-gram','btn-morfix-gram','btn-gt-gram'].forEach(id=>{
+    const btn=document.getElementById(id);
+    if(btn){if(on)btn.classList.remove('disabled');else btn.classList.add('disabled')}
+  });
+
+  // Annuler traduction en cours si off
+  notify(on?'🌐 Connexion internet activée':'📴 Connexion internet désactivée');
+}
+
+// ═══════════════════════════════════════════════════
+// LIENS EXTERNES
+// ═══════════════════════════════════════════════════
+function openGoogleTranslate(){
+  if(!state.inetOn){notify('📴 Connexion désactivée');return}
+  const text=state.rawText||'';
+  const url='https://translate.google.com/?sl=iw&tl=fr&text='+encodeURIComponent(text)+'&op=translate';
+  window.open(url,'_blank','noopener');
+}
+
+function openPealim(){
+  if(!state.inetOn){notify('📴 Connexion désactivée');return}
+  window.open('https://www.pealim.com/','_blank','noopener');
+}
+
+function openMorfix(){
+  if(!state.inetOn){notify('📴 Connexion désactivée');return}
+  window.open('https://www.morfix.co.il/','_blank','noopener');
+}
+
+function openPealimWord(){
+  if(!state.inetOn){notify('📴 Connexion désactivée');return}
+  const w=(document.getElementById('word-input-gram').value||'').trim();
+  if(!w){notify('Entrez un mot hébreu dans le champ');return}
+  // Pealim supporte la recherche par URL
+  const url='https://www.pealim.com/search/?q='+encodeURIComponent(w);
+  window.open(url,'_blank','noopener');
+}
+
+function openMorfixWord(){
+  if(!state.inetOn){notify('📴 Connexion désactivée');return}
+  const w=(document.getElementById('word-input-gram').value||'').trim();
+  if(!w){notify('Entrez un mot hébreu dans le champ');return}
+  const url='https://www.morfix.co.il/'+encodeURIComponent(w);
+  window.open(url,'_blank','noopener');
+}
+
+function openGoogleTranslateWord(){
+  if(!state.inetOn){notify('📴 Connexion désactivée');return}
+  const w=(document.getElementById('word-input-gram').value||'').trim();
+  if(!w){notify('Entrez un mot hébreu dans le champ');return}
+  const url='https://translate.google.com/?sl=iw&tl=fr&text='+encodeURIComponent(w)+'&op=translate';
+  window.open(url,'_blank','noopener');
+}
+
+// Quand on clique sur un mot dans le lexique → pré-remplit le champ grammaire
+function setWordForAnalysis(word){
+  const inp=document.getElementById('word-input-gram');
+  if(inp)inp.value=word;
+}
 
 // ═══════════════════════════════════════════════════
 // LOADING
@@ -414,8 +590,12 @@ async function loadText(text,name){
   _loadTextCore(text,name);
   state.words=[];
   showPanel('reader');
-  autoTranslate(text);
-  autoAnalyze(text);
+  if(state.inetOn){
+    autoTranslate(text);
+    autoAnalyze(text);
+  } else {
+    notify('📴 Mode hors ligne — traduction et analyse auto désactivées');
+  }
 }
 
 function _loadTextCore(text,name){
@@ -434,6 +614,7 @@ function extractSentences(t){
 // CLAUDE API — TRADUCTION
 // ═══════════════════════════════════════════════════
 async function autoTranslate(text){
+  if(!state.inetOn)return;
   const badge=document.getElementById('trad-badge');
   badge.style.display='flex';
   const box=document.getElementById('text-fr-box');
@@ -456,6 +637,7 @@ async function autoTranslate(text){
 // CLAUDE API — ANALYSE MORPHOLOGIQUE
 // ═══════════════════════════════════════════════════
 async function autoAnalyze(text){
+  if(!state.inetOn)return;
   const badge=document.getElementById('grammar-badge');
   badge.style.display='flex';
   const prompt=`Analyse morphologique de ce texte hébreu. Extrait chaque mot distinct et fournis un JSON array. Chaque objet doit avoir exactement ces champs :
@@ -568,13 +750,14 @@ function openCat(def,items,card){
   const box=document.getElementById('cat-word-list');box.className='word-list open';
   box.innerHTML=`<div style="font-size:11px;color:${def.color};margin-bottom:10px;text-transform:uppercase;letter-spacing:.1em">${def.icon} ${def.label} — ${items.length} mot(s)</div>`;
   items.forEach(w=>{
-    const row=document.createElement('div');row.className='word-row';
     const sh=w.heb.replace(/'/g,"\\'");
+    const row=document.createElement('div');row.className='word-row';
     row.innerHTML=`<button class="btn-audio" onclick="playPhrase('${sh}','he')">🔊</button>
-      <div class="word-heb">${w.heb}</div>
+      <div class="word-heb" onclick="setWordForAnalysis('${sh}')" style="cursor:pointer" title="Cliquer pour analyser ce mot">${w.heb}</div>
       <div class="word-fr">${w.fr||'—'}</div>
       <div class="word-morph">${w.morph||'—'}${w.root?' <span style="color:var(--teal)">· '+w.root+'</span>':''}</div>
-      <span class="word-type">${w.cat}</span>`;
+      <span class="word-type">${w.cat}</span>
+      <button class="btn-ext btn-ext-pea btn-xs" onclick="document.getElementById('word-input-gram').value='${sh}';openPealimWord()" title="Pealim">📖</button>`;
     box.appendChild(row);
   });
   box.scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -607,16 +790,17 @@ function renderLexicon(){
     const sh=w.heb.replace(/'/g,"\\'");
     return `<tr>
       <td><button class="btn-audio" onclick="playPhrase('${sh}','he')" style="padding:2px 7px;font-size:11px">🔊</button></td>
-      <td class="lex-heb">${w.heb}</td>
+      <td class="lex-heb" style="cursor:pointer" onclick="setWordForAnalysis('${sh}')" title="Cliquer pour analyser">${w.heb}</td>
       <td style="color:var(--cream2)">${w.fr||'—'}</td>
       <td class="lex-root">${w.root||'—'}</td>
       <td style="font-size:12px;color:var(--ink3)">${w.morph||'—'}</td>
       <td><span class="lex-badge" style="background:${c}22;color:${c}">${w.cat}</span></td>
+      <td><button class="btn-ext btn-ext-pea" style="padding:3px 8px;font-size:11px" onclick="document.getElementById('word-input-gram').value='${sh}';showPanel('grammar');setTimeout(openPealimWord,200)" title="Analyser sur Pealim">📖</button></td>
     </tr>`;
   }).join('');
-  wrap.innerHTML=`<div style="font-size:12px;color:var(--ink3);margin-bottom:8px">${words.length} mot(s)</div>
+  wrap.innerHTML=`<div style="font-size:12px;color:var(--ink3);margin-bottom:8px">${words.length} mot(s) — <span style="color:var(--teal);font-size:11px">💡 Cliquer sur un mot hébreu pour l'analyser</span></div>
     <div style="overflow-x:auto"><table class="lex-table">
-      <thead><tr><th></th><th>Hébreu</th><th>Français</th><th>Racine</th><th>Morphologie</th><th>Catégorie</th></tr></thead>
+      <thead><tr><th></th><th>Hébreu</th><th>Français</th><th>Racine</th><th>Morphologie</th><th>Catégorie</th><th>Analyse</th></tr></thead>
       <tbody>${rows}</tbody>
     </table></div>`;
 }
@@ -709,7 +893,7 @@ function delPhrase(i){state.personalPhrases.splice(i,1);renderPhrases()}
 // ═══════════════════════════════════════════════════
 // SAVE / IMPORT / EXPORT
 // ═══════════════════════════════════════════════════
-function getExport(){return{version:'4.0',docName:state.docName,rawText:state.rawText,translation:state.translation,words:state.words,personalPhrases:state.personalPhrases,exportDate:new Date().toISOString()}}
+function getExport(){return{version:'4.1',docName:state.docName,rawText:state.rawText,translation:state.translation,words:state.words,personalPhrases:state.personalPhrases,exportDate:new Date().toISOString()}}
 function downloadJSON(){downloadBlob(JSON.stringify(getExport(),null,2),'ivrit_drill_data.json','application/json');notify('⬇️ JSON téléchargé')}
 function downloadHTML(){downloadBlob(document.documentElement.outerHTML,'ivrit_drill_v4.html','text/html');notify('⬇️ HTML téléchargé')}
 function downloadBlob(content,filename,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),5000)}
@@ -742,7 +926,6 @@ function notify(msg){const n=document.getElementById('notif');n.textContent=msg;
 
 // Auto-load גן נעול on startup
 window.addEventListener('load',()=>loadDemo());
-
 </script>
 </body>
 </html>
