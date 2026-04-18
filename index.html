@@ -712,11 +712,12 @@ async function autoTranslate(text){
         messages:[{role:'user',content:'Traduis ce texte hébreu en français naturel. Conserve les retours à la ligne. Réponds UNIQUEMENT avec la traduction, sans commentaires.\n\n'+text}]})
     });
     const d=await r.json();
+    if(d.error){badge.style.display='none';box.textContent='Erreur API : '+d.error.message;box.style.color='var(--red)';return}
     const trad=d.content?.find(b=>b.type==='text')?.text||'';
     badge.style.display='none';
     if(trad){state.translation=trad;updateFrBox();notify('✓ Traduction automatique prête')}
     else{box.textContent='Traduction non disponible.';notify('⚠️ Traduction échouée')}
-  }catch(e){badge.style.display='none';box.textContent='Erreur API traduction.';box.style.color='var(--red)'}
+  }catch(e){badge.style.display='none';box.textContent='Erreur réseau — vérifiez votre clé API (🔑 Configuration).';box.style.color='var(--red)'}
 }
 
 // ═══════════════════════════════════════════════════
@@ -745,16 +746,18 @@ Réponds UNIQUEMENT avec le JSON array brut, sans backticks, sans commentaires.`
         messages:[{role:'user',content:prompt}]})
     });
     const d=await r.json();
+    if(d.error){badge.style.display='none';notify('⚠️ Erreur API : '+d.error.message);return}
     const raw=d.content?.find(b=>b.type==='text')?.text||'';
     const clean=raw.replace(/```(?:json)?|```/g,'').trim();
-    const words=JSON.parse(clean);
+    let words;
+    try{words=JSON.parse(clean);}catch(je){badge.style.display='none';notify('⚠️ Erreur format JSON analyse');return}
     badge.style.display='none';
     if(Array.isArray(words)&&words.length){
       state.words=words;
       document.getElementById('status-text').textContent=state.sentences.length+' phrases · '+words.length+' mots';
       notify('✓ Analyse morphologique prête ('+words.length+' mots)');
     }
-  }catch(e){badge.style.display='none';notify('⚠️ Erreur analyse morphologique')}
+  }catch(e){badge.style.display='none';notify('⚠️ Erreur réseau — vérifiez votre clé API (🔑 Configuration)')}
 }
 
 // ═══════════════════════════════════════════════════
@@ -1176,15 +1179,38 @@ Crée 2 à 4 catégories pertinentes selon le type d'analyse demandé. Sois pré
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages:[{role:'user',content:prompt}]})
     });
     const data=await resp.json();
+    // Vérifier erreur API
+    if(data.error){
+      badge.style.display='none';
+      placeholder.style.display='block';
+      placeholder.textContent='⚠️ Erreur API : '+data.error.message;
+      notify('⚠️ '+data.error.message);
+      return;
+    }
+    if(!data.content||!Array.isArray(data.content)){
+      badge.style.display='none';
+      placeholder.style.display='block';
+      placeholder.textContent='⚠️ Réponse API invalide. Vérifiez votre clé API dans 🔑 Configuration.';
+      notify('⚠️ Réponse invalide — clé API ?');
+      return;
+    }
     const raw=data.content.map(b=>b.text||'').join('');
     const clean=raw.replace(/```json|```/g,'').trim();
-    const parsed=JSON.parse(clean);
+    let parsed;
+    try{parsed=JSON.parse(clean);}
+    catch(je){
+      badge.style.display='none';
+      placeholder.style.display='block';
+      placeholder.textContent='⚠️ Réponse non-JSON : '+raw.substring(0,120);
+      notify('⚠️ Erreur de format JSON');
+      return;
+    }
     badge.style.display='none';
     renderGramTextResults(parsed);
   }catch(e){
     badge.style.display='none';
     placeholder.style.display='block';
-    placeholder.textContent='⚠️ Erreur d\'analyse : '+e.message;
+    placeholder.textContent='⚠️ Erreur réseau : '+e.message+' — Vérifiez votre clé API dans 🔑 Configuration.';
     notify('⚠️ Erreur : '+e.message);
   }
 }
