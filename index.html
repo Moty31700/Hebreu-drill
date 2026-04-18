@@ -1196,19 +1196,45 @@ function importHTML(e){
     try{
       const parser=new DOMParser();
       const doc=parser.parseFromString(ev.target.result,'text/html');
-      // Chercher les données dans le script
+      const docName=file.name.replace(/\.html?$/i,'');
       const scripts=doc.querySelectorAll('script');
       let found=false;
+
+      // 1. Chercher DEMO_HEB / DEMO_TRAD (format sauvegardé par cette app)
       scripts.forEach(s=>{
-        const m=s.textContent.match(/const DEMO_HEB\s*=\s*`([^`]*)`/);
-        const mt=s.textContent.match(/const DEMO_TRAD\s*=\s*`([^`]*)`/);
-        if(m){
-          loadTextIntoApp(m[1].trim(), mt?mt[1].trim():'', file.name.replace('.html',''));
+        if(found)return;
+        const m=s.textContent.match(/const DEMO_HEB\s*=\s*`([\s\S]*?)`/);
+        const mt=s.textContent.match(/const DEMO_TRAD\s*=\s*`([\s\S]*?)`/);
+        if(m&&m[1].trim()){
+          const heb=m[1].trim();
+          const trad=mt?mt[1].trim():'';
+          _loadTextCore(heb, docName);
+          state.words=[];
+          state.translation=trad;
+          if(trad)updateFrBox();
+          showPanel('reader');
+          if(state.inetOn&&!trad){autoTranslate(heb);autoAnalyze(heb);}
+          else if(state.inetOn){autoAnalyze(heb);}
+          notify('✓ HTML importé : '+docName);
           found=true;
         }
       });
-      if(!found)notify('⚠️ Aucun texte trouvé dans ce fichier HTML');
-    }catch(err){notify('⚠️ Erreur lecture HTML : '+err.message)}
+
+      // 2. Fallback : extraire tout texte hébreu visible du body
+      if(!found){
+        const body=doc.body;
+        if(body){
+          const text=(body.innerText||body.textContent||'').trim();
+          const hebLines=text.split(/\n+/).map(l=>l.trim()).filter(l=>/[\u05D0-\u05EA]/.test(l)&&l.length>1);
+          if(hebLines.length){
+            loadText(hebLines.join('\n'), docName);
+            found=true;
+          }
+        }
+      }
+
+      if(!found)notify('⚠️ Aucun texte hébreu trouvé dans ce fichier HTML');
+    }catch(err){notify('⚠️ Erreur lecture HTML : '+err.message);console.error(err)}
   };
   r.readAsText(file,'UTF-8');e.target.value='';
 }
